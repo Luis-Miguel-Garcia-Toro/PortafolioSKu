@@ -4,7 +4,9 @@ import { Card, Col } from "antd";
 interface ClientData {
   clientId: string;
   region: string;
-  cediName: string;
+  razonSocial: string;
+  nombreBodega : string;
+  nombreMision : string;
   vendorCode: string;
   verdict?: string | null; 
   zonaRDV ?: string | null; 
@@ -23,12 +25,13 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ photoUrl, clientData }) => {
         cover={<img alt="Foto" src={photoUrl} style={{ height: 300 }} />}
       >
         <Card.Meta
-          title={`Cliente: ${clientData.clientId}`}
+          //title={`Cliente: ${clientData.clientId}`}
           description={
             <div>
               <p><strong>Zona:</strong> {clientData.zonaRDV}</p>
-              <p><strong>Nombre Cedi:</strong> {clientData.cediName}</p>
-              <p><strong>Codigo Vendedor:</strong> {clientData.vendorCode}</p>
+              <p><strong>Cliente:</strong> {clientData.clientId}</p>
+              <p><strong>Nombre Cedi:</strong> {clientData.nombreBodega}</p>
+              <p><strong>Nombre Mision:</strong> {clientData.nombreMision}</p>
               {clientData.verdict && (
                 <p><strong>Veredicto:</strong> {clientData.verdict}</p>
               )}

@@ -9,13 +9,14 @@ import {
   Button,
   Collapse,
   Input,
+  Pagination,
+  DatePicker
 } from "antd";
 import { useForm, Controller } from "react-hook-form";
 import UserServices from "../Services/Sevices"; // Ensure the path is correct
 
 import PhotoCard from "./PhotoCard";
 import Skeleton, { SkeletonType } from "./Skeleton";
-import { DatePicker } from "antd";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 
@@ -29,6 +30,7 @@ interface ClientData {
   cediName: string;
   vendorCode: string;
 }
+
 
 interface PhotoData {
   url: string;
@@ -45,6 +47,9 @@ const Filters: React.FC = () => {
   const [dataBodega, setdataBodega] = useState<any>([]);
   const [dataAgrupaMotor, setdataAgrupaMotor] = useState<any>([]);
   // const [dataFechaFin, setdataFechaFin] = useState<any>([]);
+  const [paginaActual, setPaginaActual] = useState(1);
+  const [imgxPagina, setImgxPagina] = useState(0)
+  const [formData, setFormData] = useState<any>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -80,8 +85,8 @@ const Filters: React.FC = () => {
   const { control, handleSubmit, watch, setValue } = useForm({
     defaultValues: {
       misionId: null,
-      fechaInicio: "",
-      fechaFin: "",
+      fechaInicio: null,
+      fechaFin: null,
       motorId: null as number | null,
       agrupadorMotor: null as number | null,
       tipoMision: "",
@@ -96,8 +101,8 @@ const Filters: React.FC = () => {
       gdv: "",
       zonaRDV: "",
       veredict: "",
-      page: 1,
-      pageSize: 1000,
+      page: paginaActual,
+      pageSize: 100,
     },
   });
 
@@ -138,11 +143,14 @@ const Filters: React.FC = () => {
     // console.log(fieldName, value, "input" )
   };
   const addFilterPho = async (data: any) => {
+    data.page = paginaActual;
     try {
+      setLoading(true);
       const [RespuestaPho] = await Promise.all([
         UserServices.PostFiltros(data),
       ]);
-
+      setPaginaActual(RespuestaPho.data.paginaActual);
+      setImgxPagina(RespuestaPho.data.totalPaginas);
       setPhotos(RespuestaPho.data.imagenes);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -152,10 +160,18 @@ const Filters: React.FC = () => {
   };
   const handleOnSubmit = (data: any) => {
     addFilterPho(data);
+    setFormData(data)
   };
+
+  const changePaginator = (page: number) => {
+    setPaginaActual(page)
+    addFilterPho(formData)
+  }
 
   return (
     <div style={{ padding: "30px" }}>
+      
+      <Form layout="vertical" onFinish={handleSubmit(handleOnSubmit)}>
       <Button
         type="primary"
         onClick={toggleFilters}
@@ -165,7 +181,6 @@ const Filters: React.FC = () => {
       </Button>
       <Collapse activeKey={expandFilters ? ["1"] : []}>
         <Panel header="Filtros" key="1">
-          <Form layout="vertical" onFinish={handleSubmit(handleOnSubmit)}>
             <Row gutter={[8, 24]}>
               <Col xs={24} sm={12} lg={4}>
                 <Card hoverable>
@@ -309,10 +324,10 @@ const Filters: React.FC = () => {
                           style={{ width: "100%" }}
                           dropdownStyle={{ borderColor: "#1890ff" }}
                         >
-                          <Option value="CapturaImagen">Captura Imagen</Option>
-                          <Option value="Encuesta">Encuesta</Option>
-                          <Option value="Portafolio66">Portafolio</Option>
-                          <Option value="Solicitudes">Solicitudes</Option>
+                          <Option value="1">Captura Imagen</Option>
+                          <Option value="2">Encuesta</Option>
+                          <Option value="3">Portafolio</Option>
+                          <Option value="4">Solicitudes</Option>
                         </Select>
                       )}
                     />
@@ -553,7 +568,7 @@ const Filters: React.FC = () => {
               </Col>
               <Col xs={24} sm={12} lg={4}>
                 <Card hoverable>
-                  <Form.Item label="Imag por paguina">
+                  <Form.Item label="Imagenes por pagina">
                     <Controller
                       name="pageSize"
                       control={control}
@@ -586,7 +601,6 @@ const Filters: React.FC = () => {
                 {loading ? "Buscando..." : "Buscar"}
               </Button>
             </div>
-          </Form>
         </Panel>
       </Collapse>
       <Divider />
@@ -599,6 +613,12 @@ const Filters: React.FC = () => {
           ))}
         </Row>
       )}
+      {
+        imgxPagina > 0 &&
+        <Pagination onChange={(page)=>{changePaginator(page)}} defaultCurrent={paginaActual} total={imgxPagina}></Pagination>
+      }
+      
+      </Form>
     </div>
   );
 };
