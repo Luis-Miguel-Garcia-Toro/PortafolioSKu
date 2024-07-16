@@ -1,0 +1,606 @@
+import React, { useState, useEffect } from "react";
+import {
+  Select,
+  Row,
+  Col,
+  Form,
+  Card,
+  Divider,
+  Button,
+  Collapse,
+  Input,
+} from "antd";
+import { useForm, Controller } from "react-hook-form";
+import UserServices from "../Services/Sevices"; // Ensure the path is correct
+
+import PhotoCard from "./PhotoCard";
+import Skeleton, { SkeletonType } from "./Skeleton";
+import { DatePicker } from "antd";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+
+const { Option } = Select;
+const { Panel } = Collapse;
+const dateFormat = "YYYY-MM-DD";
+interface ClientData {
+  clientId: string;
+  region: string;
+  regional: string;
+  cediName: string;
+  vendorCode: string;
+}
+
+interface PhotoData {
+  url: string;
+  clientData: ClientData;
+}
+
+const Filters: React.FC = () => {
+  const [expandFilters, setExpandFilters] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [photos, setPhotos] = useState<any>([]);
+  const [dataMisiones, setdataMisiones] = useState<any>([]);
+  const [dataTipoMotor, setdataTipoMotor] = useState<any>([]);
+  const [dataRegional, setdataRegional] = useState<any>([]);
+  const [dataBodega, setdataBodega] = useState<any>([]);
+  const [dataAgrupaMotor, setdataAgrupaMotor] = useState<any>([]);
+  // const [dataFechaFin, setdataFechaFin] = useState<any>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [
+          misionesResponse,
+          tipoMotorResponse,
+          regionalResponse,
+          bodegaResponse,
+        ] = await Promise.all([
+          UserServices.GetImgMisiones(),
+          UserServices.GetTipoMotor(),
+          UserServices.GetRegional(),
+          UserServices.GetBodega(),
+        ]);
+
+        setdataMisiones(misionesResponse.data);
+        setdataTipoMotor(tipoMotorResponse.data);
+        setdataRegional(regionalResponse.data);
+        setdataAgrupaMotor(dataAgrupaMotor.data);
+        // console.log(dataAgrupaMotor, "agrupador]Motro");
+        setdataBodega(bodegaResponse.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const { control, handleSubmit, watch, setValue } = useForm({
+    defaultValues: {
+      misionId: null,
+      fechaInicio: "",
+      fechaFin: "",
+      motorId: null as number | null,
+      agrupadorMotor: null as number | null,
+      tipoMision: "",
+      codigoRegional: "",
+      bodega: "",
+      nombreMision: "",
+      nombreNegocio: "",
+      codigoCliente: "",
+      jdv: "",
+      sdv: "",
+      rdv: "",
+      gdv: "",
+      zonaRDV: "",
+      veredict: "",
+      page: 1,
+      pageSize: 1000,
+    },
+  });
+
+  const selectedMissionId = watch("nombreMision");
+
+  useEffect(() => {
+    if (selectedMissionId && dataMisiones.length > 0) {
+      const selectedMission = dataMisiones.find(
+        (mision: any) => mision.id === selectedMissionId
+      );
+
+      if (selectedMission) {
+        const selectedMotor = dataTipoMotor.find(
+          (motor: any) => motor.id == selectedMission.motorId
+        );
+        // console.log(selectedMission, "jujujuuju");
+
+        setValue("motorId", selectedMotor ? selectedMotor.id : "");
+        setValue(
+          "agrupadorMotor",
+          selectedMission.agrupadorMotor
+            ? Number(selectedMission.agrupadorMotor)
+            : null
+        );
+        setValue("fechaInicio", selectedMission.fechaInicio);
+        setValue("fechaFin", selectedMission.fechaFin);
+        setValue("misionId", selectedMission.id);
+        setValue("nombreMision", selectedMission.nombreMision);
+      }
+    }
+  }, [selectedMissionId, dataMisiones, dataTipoMotor, setValue]);
+  const toggleFilters = () => {
+    setExpandFilters(!expandFilters);
+  };
+
+  const handleInputChange = (fieldName: any, value: any) => {
+    setValue(fieldName, value);
+    // console.log(fieldName, value, "input" )
+  };
+  const addFilterPho = async (data: any) => {
+    try {
+      const [RespuestaPho] = await Promise.all([
+        UserServices.PostFiltros(data),
+      ]);
+
+      setPhotos(RespuestaPho.data.imagenes);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleOnSubmit = (data: any) => {
+    addFilterPho(data);
+  };
+
+  return (
+    <div style={{ padding: "30px" }}>
+      <Button
+        type="primary"
+        onClick={toggleFilters}
+        style={{ marginBottom: "16px" }}
+      >
+        {expandFilters ? "Ocultar Filtros" : "Mostrar Filtros"}
+      </Button>
+      <Collapse activeKey={expandFilters ? ["1"] : []}>
+        <Panel header="Filtros" key="1">
+          <Form layout="vertical" onFinish={handleSubmit(handleOnSubmit)}>
+            <Row gutter={[8, 24]}>
+              <Col xs={24} sm={12} lg={4}>
+                <Card hoverable>
+                  <Form.Item label="Nombre Misión">
+                    <Controller
+                      name="nombreMision"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          {...field}
+                          showSearch
+                          optionFilterProp="label"
+                          filterSort={(optionA, optionB) =>
+                            (optionA?.label ?? "")
+                              .toLowerCase()
+                              .localeCompare(
+                                (optionB?.label ?? "").toLowerCase()
+                              )
+                          }
+                          placeholder="Seleccionar Misión"
+                          style={{ width: "100%" }}
+                          dropdownStyle={{ borderColor: "#1890ff" }}
+                        >
+                          {dataMisiones.map((mision: any) => (
+                            <Option
+                              key={mision.id}
+                              value={mision.id}
+                              label={mision.nombreMision}
+                            >
+                              {mision.nombreMision}
+                            </Option>
+                          ))}
+                        </Select>
+                      )}
+                    />
+                  </Form.Item>
+                </Card>
+              </Col>
+              <Col xs={24} sm={12} lg={4}>
+                <Card hoverable>
+                  <Form.Item label="Fecha inicial">
+                    <Controller
+                      name="fechaInicio"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          {...field}
+                          placeholder="Fecha inicial"
+                          style={{ width: "100%" }}
+                          dropdownStyle={{ borderColor: "#1890ff" }}
+                        ></Select>
+                      )}
+                    />
+                  </Form.Item>
+                </Card>
+              </Col>
+              <Col xs={24} sm={12} lg={4}>
+                <Card hoverable>
+                  <Form.Item label="Fecha Final">
+                    <Controller
+                      name="fechaFin"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          {...field}
+                          placeholder="Fecha Final"
+                          style={{ width: "100%" }}
+                          dropdownStyle={{ borderColor: "#1890ff" }}
+                        >
+                          <Option value="mision1">Misión 1</Option>
+                          <Option value="mision2">Misión 2</Option>
+                        </Select>
+                      )}
+                    />
+                  </Form.Item>
+                </Card>
+              </Col>
+
+              <Col xs={24} sm={12} lg={4}>
+                <Card hoverable>
+                  <Form.Item label="Tipo Motor">
+                    <Controller
+                      name="motorId"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          {...field}
+                          placeholder="Seleccionar Motor"
+                          style={{ width: "100%" }}
+                          dropdownStyle={{ borderColor: "#1890ff" }}
+                        >
+                          {dataTipoMotor.map((motor: any) => (
+                            <Option key={motor.id} value={motor.id}>
+                              {motor.nombre}
+                            </Option>
+                          ))}
+                        </Select>
+                      )}
+                    />
+                  </Form.Item>
+                </Card>
+              </Col>
+              {/* /////// pendiente  */}
+              <Col xs={24} sm={12} lg={4}>
+                <Card hoverable>
+                  <Form.Item label="Agrupador Motor">
+                    <Controller
+                      name="agrupadorMotor"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          {...field}
+                          placeholder="agrupadorMotor"
+                          style={{ width: "100%" }}
+                          dropdownStyle={{ borderColor: "#1890ff" }}
+                        >
+                          {/* {dataAgrupaMotor.map((Amotor: any) => (
+                            <Option
+                              key={Amotor.codigo}
+                              value={Amotor.codigo}
+                            >
+                              {Amotor.agrupadorMotor}
+                            </Option>
+                          ))} */}
+                        </Select>
+                      )}
+                    />
+                  </Form.Item>
+                </Card>
+              </Col>
+              <Col xs={24} sm={12} lg={4}>
+                <Card hoverable>
+                  <Form.Item label="Tipo Misión">
+                    <Controller
+                      name="tipoMision"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          {...field}
+                          placeholder="Seleccionar TipoMisión"
+                          style={{ width: "100%" }}
+                          dropdownStyle={{ borderColor: "#1890ff" }}
+                        >
+                          <Option value="CapturaImagen">Captura Imagen</Option>
+                          <Option value="Encuesta">Encuesta</Option>
+                          <Option value="Portafolio66">Portafolio</Option>
+                          <Option value="Solicitudes">Solicitudes</Option>
+                        </Select>
+                      )}
+                    />
+                  </Form.Item>
+                </Card>
+              </Col>
+              {/* <Col xs={24} sm={12} lg={4}>
+                <Card hoverable>
+                  <Form.Item label="Estado">
+                    <Controller
+                      name="estado"              falta estadio
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          {...field}
+                          placeholder="Seleccionar Misión"
+                          style={{ width: "100%" }}
+                          dropdownStyle={{ borderColor: "#1890ff" }}
+                        >
+                          <Option value="mision1">Misión 1</Option>
+                          <Option value="mision2">Misión 2</Option>
+                        </Select>
+                      )}
+                    />
+                  </Form.Item>
+                </Card>
+              </Col> */}
+              <Col xs={24} sm={12} lg={4}>
+                <Card hoverable>
+                  <Form.Item label="Veredicto">
+                    <Controller
+                      name="veredict"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          {...field}
+                          placeholder="Seleccionar Veredicto"
+                          style={{ width: "100%" }}
+                          dropdownStyle={{ borderColor: "#1890ff" }}
+                        >
+                          <Option value="">Seleccione</Option>
+                          <Option value="true">True</Option>
+                          <Option value="false">False</Option>
+                        </Select>
+                      )}
+                    />
+                  </Form.Item>
+                </Card>
+              </Col>
+              <Col xs={24} sm={12} lg={4}>
+                <Card hoverable>
+                  <Form.Item label="Nombre Regional">
+                    <Controller
+                      name="codigoRegional"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          {...field}
+                          placeholder="Seleccione una regional"
+                          style={{ width: "100%" }}
+                          dropdownStyle={{ borderColor: "#1890ff" }}
+                        >
+                          {dataRegional.map((regional: any) => (
+                            <Option
+                              key={regional.codigo}
+                              value={regional.codigo}
+                            >
+                              {regional.nombreRegional}
+                            </Option>
+                          ))}
+                        </Select>
+                      )}
+                    />
+                  </Form.Item>
+                </Card>
+              </Col>
+              <Col xs={24} sm={12} lg={4}>
+                <Card hoverable>
+                  <Form.Item label="Nombre Cedi">
+                    <Controller
+                      name="bodega"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          {...field}
+                          placeholder="Seleccionar una Cedi"
+                          style={{ width: "100%" }}
+                          dropdownStyle={{ borderColor: "#1890ff" }}
+                        >
+                          {dataBodega.map((cedi: any) => (
+                            <Option key={cedi.codigo} value={cedi.codigo}>
+                              {cedi.nombreBodega}
+                            </Option>
+                          ))}
+                        </Select>
+                      )}
+                    />
+                  </Form.Item>
+                </Card>
+              </Col>
+              <Col xs={24} sm={12} lg={4}>
+                <Card hoverable>
+                  <Form.Item label="Jefe Ventas">
+                    <Controller
+                      name="jdv"
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          placeholder="Escribir Jefe Ventas"
+                          style={{ width: "100%" }}
+                          onChange={(e) =>
+                            handleInputChange("jdv", e.target.value)
+                          }
+                        />
+                      )}
+                    />
+                  </Form.Item>
+                </Card>
+              </Col>
+              <Col xs={24} sm={12} lg={4}>
+                <Card hoverable>
+                  <Form.Item label="Supervisor">
+                    <Controller
+                      name="sdv"
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          placeholder="Escribir Supervisor"
+                          style={{ width: "100%" }}
+                          onChange={(e) =>
+                            handleInputChange("sdv", e.target.value)
+                          }
+                        />
+                      )}
+                    />
+                  </Form.Item>
+                </Card>
+              </Col>
+              <Col xs={24} sm={12} lg={4}>
+                <Card hoverable>
+                  <Form.Item label="Zona Representantes">
+                    <Controller
+                      name="zonaRDV"
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          placeholder="Escribir zonaRDV"
+                          style={{ width: "100%" }}
+                          onChange={(e) =>
+                            handleInputChange("zonaRDV", e.target.value)
+                          }
+                        />
+                      )}
+                    />
+                  </Form.Item>
+                </Card>
+              </Col>
+              <Col xs={24} sm={12} lg={4}>
+                <Card hoverable>
+                  <Form.Item label="RDV">
+                    <Controller
+                      name="rdv"
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          placeholder="Escribir rdv"
+                          style={{ width: "100%" }}
+                          onChange={(e) =>
+                            handleInputChange("rdv", e.target.value)
+                          }
+                        />
+                      )}
+                    />
+                  </Form.Item>
+                </Card>
+              </Col>
+              <Col xs={24} sm={12} lg={4}>
+                <Card hoverable>
+                  <Form.Item label="Código Cliente">
+                    <Controller
+                      name="codigoCliente"
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          placeholder="Escribir Código Cliente"
+                          style={{ width: "100%" }}
+                          onChange={(e) =>
+                            handleInputChange("codigoCliente", e.target.value)
+                          }
+                        />
+                      )}
+                    />
+                  </Form.Item>
+                </Card>
+              </Col>
+              <Col xs={24} sm={12} lg={4}>
+                <Card hoverable>
+                  <Form.Item label="Nombre Negocio">
+                    <Controller
+                      name="nombreNegocio"
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          onChange={(e) =>
+                            handleInputChange("nombreNegocio", e.target.value)
+                          }
+                        />
+                      )}
+                    />
+                  </Form.Item>
+                </Card>
+              </Col>
+              <Col xs={24} sm={12} lg={4}>
+                <Card hoverable>
+                  <Form.Item label="gerente Venta">
+                    <Controller
+                      name="gdv"
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          placeholder="Escribir gerente Venta"
+                          style={{ width: "100%" }}
+                          onChange={(e) =>
+                            handleInputChange("gdv", e.target.value)
+                          }
+                        />
+                      )}
+                    />
+                  </Form.Item>
+                </Card>
+              </Col>
+              <Col xs={24} sm={12} lg={4}>
+                <Card hoverable>
+                  <Form.Item label="Imag por paguina">
+                    <Controller
+                      name="pageSize"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          {...field}
+                          placeholder="Total IAmgenes"
+                          style={{ width: "100%" }}
+                          dropdownStyle={{ borderColor: "#1890ff" }}
+                        >
+                          <Option value={100}>100</Option>
+                          <Option value={500}>500</Option>
+                          <Option value={1000}>1.000</Option>
+                          <Option value={100000}>100.000</Option>
+                        </Select>
+                      )}
+                    />
+                  </Form.Item>
+                </Card>
+              </Col>
+            </Row>
+            <Divider />
+            <div className="container-btn">
+              <Button
+                type="primary"
+                htmlType="submit"
+                className="Button"
+                disabled={loading}
+              >
+                {loading ? "Buscando..." : "Buscar"}
+              </Button>
+            </div>
+          </Form>
+        </Panel>
+      </Collapse>
+      <Divider />
+      {loading ? (
+        <Skeleton height={50} variant={SkeletonType.default} />
+      ) : (
+        <Row gutter={[16, 16]}>
+          {photos.map((photo: any, index: any) => (
+            <PhotoCard key={index} photoUrl={photo.url} clientData={photo} />
+          ))}
+        </Row>
+      )}
+    </div>
+  );
+};
+
+export default Filters;

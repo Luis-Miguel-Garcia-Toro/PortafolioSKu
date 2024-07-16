@@ -1,0 +1,44 @@
+.layout {
+  min-height: 100vh;
+  background-color: #ffffff;
+}
+
+.header {
+  color: white;
+  font-size: 24px;
+  text-align: center;
+  background-color: #ffffff; /* Cambia el color de fondo según tu diseño */
+}
+
+/* .content {
+    padding: 20px;
+  } */
+
+.logo-img {
+  display: flex;
+  justify-content: space-around;
+  padding: 2px, 0, 0, 0;
+  cursor: pointer;
+  
+  img {
+    width: 126px;
+    /* height: 80px; */
+    padding: 27px, 0, 0, 0;
+  }
+}
+
+.card {
+  padding: 20px, 0, 0, 0;
+}
+
+.container-btn {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.Button {
+  width: 390px;
+  font-size: 18px;
+}
+
