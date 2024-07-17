@@ -10,7 +10,7 @@ import {
   Collapse,
   Input,
   Pagination,
-  DatePicker
+  DatePicker,
 } from "antd";
 import { useForm, Controller } from "react-hook-form";
 import UserServices from "../Services/Sevices"; // Ensure the path is correct
@@ -31,7 +31,6 @@ interface ClientData {
   vendorCode: string;
 }
 
-
 interface PhotoData {
   url: string;
   clientData: ClientData;
@@ -48,7 +47,7 @@ const Filters: React.FC = () => {
   const [dataAgrupaMotor, setdataAgrupaMotor] = useState<any>([]);
   // const [dataFechaFin, setdataFechaFin] = useState<any>([]);
   const [paginaActual, setPaginaActual] = useState(1);
-  const [imgxPagina, setImgxPagina] = useState(0)
+  const [imgxPagina, setImgxPagina] = useState(0);
   const [formData, setFormData] = useState<any>(null);
 
   useEffect(() => {
@@ -160,27 +159,26 @@ const Filters: React.FC = () => {
   };
   const handleOnSubmit = (data: any) => {
     addFilterPho(data);
-    setFormData(data)
+    setFormData(data);
   };
 
   const changePaginator = (page: number) => {
-    setPaginaActual(page)
-    addFilterPho(formData)
-  }
+    setPaginaActual(page);
+    addFilterPho(formData);
+  };
 
   return (
     <div style={{ padding: "30px" }}>
-      
       <Form layout="vertical" onFinish={handleSubmit(handleOnSubmit)}>
-      <Button
-        type="primary"
-        onClick={toggleFilters}
-        style={{ marginBottom: "16px" }}
-      >
-        {expandFilters ? "Ocultar Filtros" : "Mostrar Filtros"}
-      </Button>
-      <Collapse activeKey={expandFilters ? ["1"] : []}>
-        <Panel header="Filtros" key="1">
+        <Button
+          type="primary"
+          onClick={toggleFilters}
+          style={{ marginBottom: "16px" }}
+        >
+          {expandFilters ? "Ocultar Filtros" : "Mostrar Filtros"}
+        </Button>
+        <Collapse activeKey={expandFilters ? ["1"] : []}>
+          <Panel header="Filtros" key="1">
             <Row gutter={[8, 24]}>
               <Col xs={24} sm={12} lg={4}>
                 <Card hoverable>
@@ -250,8 +248,8 @@ const Filters: React.FC = () => {
                           style={{ width: "100%" }}
                           dropdownStyle={{ borderColor: "#1890ff" }}
                         >
-                          <Option value="mision1">Misión 1</Option>
-                          <Option value="mision2">Misión 2</Option>
+                          {/* <Option value="mision1">Misión 1</Option> */}
+                          {/* <Option value="mision2">Misión 2</Option> */}
                         </Select>
                       )}
                     />
@@ -368,9 +366,9 @@ const Filters: React.FC = () => {
                           style={{ width: "100%" }}
                           dropdownStyle={{ borderColor: "#1890ff" }}
                         >
-                          <Option value="">Seleccione</Option>
-                          <Option value="true">True</Option>
-                          <Option value="false">False</Option>
+                          <Option value="">Seleccionar</Option>
+                          <Option value="true">Aprobado</Option>
+                          <Option value="false">No Aprobado</Option>
                         </Select>
                       )}
                     />
@@ -386,10 +384,15 @@ const Filters: React.FC = () => {
                       render={({ field }) => (
                         <Select
                           {...field}
-                          placeholder="Seleccione una regional"
+                          placeholder="regional"
                           style={{ width: "100%" }}
                           dropdownStyle={{ borderColor: "#1890ff" }}
+                          defaultValue="" // Valor por defecto cuando no se ha seleccionado nada
                         >
+                          {/* Opción vacía para mostrar el placeholder */}
+                          <Option value="">Seleccionar</Option>
+
+                          {/* Mapeo de las opciones */}
                           {dataRegional.map((regional: any) => (
                             <Option
                               key={regional.codigo}
@@ -416,7 +419,9 @@ const Filters: React.FC = () => {
                           placeholder="Seleccionar una Cedi"
                           style={{ width: "100%" }}
                           dropdownStyle={{ borderColor: "#1890ff" }}
+                          defaultValue=""
                         >
+                          <Option value="">Seleccionar</Option>
                           {dataBodega.map((cedi: any) => (
                             <Option key={cedi.codigo} value={cedi.codigo}>
                               {cedi.nombreBodega}
@@ -537,6 +542,7 @@ const Filters: React.FC = () => {
                       render={({ field }) => (
                         <Input
                           {...field}
+                          placeholder="Escribir el nombre del negocio"
                           onChange={(e) =>
                             handleInputChange("nombreNegocio", e.target.value)
                           }
@@ -601,23 +607,34 @@ const Filters: React.FC = () => {
                 {loading ? "Buscando..." : "Buscar"}
               </Button>
             </div>
-        </Panel>
-      </Collapse>
-      <Divider />
-      {loading ? (
-        <Skeleton height={50} variant={SkeletonType.default} />
-      ) : (
-        <Row gutter={[16, 16]}>
-          {photos.map((photo: any, index: any) => (
-            <PhotoCard key={index} photoUrl={photo.url} clientData={photo} />
-          ))}
-        </Row>
-      )}
-      {
-        imgxPagina > 0 &&
-        <Pagination onChange={(page)=>{changePaginator(page)}} defaultCurrent={paginaActual} total={imgxPagina}></Pagination>
-      }
-      
+          </Panel>
+        </Collapse>
+        <Divider />
+       {loading ? (
+        <div className="loading-container">
+          <img
+            src="/Postobon1.png"
+            className="loading-logo blinking"
+            alt="Loading logo"
+          />
+          <div className="loading-text">Cargando...</div>
+        </div>
+        ) : (
+          <Row gutter={[16, 16]}>
+            {photos.map((photo: any, index: any) => (
+              <PhotoCard key={index} photoUrl={photo.url} clientData={photo} />
+            ))}
+          </Row>
+        )}
+        {imgxPagina > 0 && (
+          <Pagination
+            onChange={(page) => {
+              changePaginator(page);
+            }}
+            defaultCurrent={paginaActual}
+            total={imgxPagina}
+          ></Pagination>
+        )}
       </Form>
     </div>
   );
