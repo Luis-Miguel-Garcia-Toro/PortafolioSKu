@@ -14,9 +14,9 @@ import {
 } from "antd";
 import { useForm, Controller } from "react-hook-form";
 import UserServices from "../Services/Sevices"; // Ensure the path is correct
+import "../../Styles/Skeleton.scss";
 
 import PhotoCard from "./PhotoCard";
-import Skeleton, { SkeletonType } from "./Skeleton";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 
@@ -106,8 +106,23 @@ const Filters: React.FC = () => {
   });
 
   const selectedMissionId = watch("nombreMision");
+  const selectRegional = watch("codigoRegional");
 
   useEffect(() => {
+    if (selectRegional && dataRegional.length > 0) {
+      const selecteRegional = dataRegional.find(
+        (regional: any) => regional.codigo == selectRegional
+      );
+      setValue("codigoRegional", selecteRegional.codigo);
+
+      const selectedBodega = dataBodega.filter(
+        (bodega: any) => bodega.codigoRegional == selectRegional
+      );
+      setdataBodega(selectedBodega);
+      setValue("bodega", selectedBodega);
+
+      console.log(selectedBodega, "bodega seleccionada");
+    }
     if (selectedMissionId && dataMisiones.length > 0) {
       const selectedMission = dataMisiones.find(
         (mision: any) => mision.id === selectedMissionId
@@ -117,6 +132,7 @@ const Filters: React.FC = () => {
         const selectedMotor = dataTipoMotor.find(
           (motor: any) => motor.id == selectedMission.motorId
         );
+
         // console.log(selectedMission, "jujujuuju");
 
         setValue("motorId", selectedMotor ? selectedMotor.id : "");
@@ -130,9 +146,16 @@ const Filters: React.FC = () => {
         setValue("fechaFin", selectedMission.fechaFin);
         setValue("misionId", selectedMission.id);
         setValue("nombreMision", selectedMission.nombreMision);
+        setValue("nombreMision", selectedMission.nombreMision);
       }
     }
-  }, [selectedMissionId, dataMisiones, dataTipoMotor, setValue]);
+  }, [
+    selectedMissionId,
+    selectRegional,
+    dataMisiones,
+    dataTipoMotor,
+    setValue,
+  ]);
   const toggleFilters = () => {
     setExpandFilters(!expandFilters);
   };
@@ -142,7 +165,6 @@ const Filters: React.FC = () => {
     // console.log(fieldName, value, "input" )
   };
   const addFilterPho = async (data: any) => {
-    data.page = paginaActual;
     try {
       setLoading(true);
       const [RespuestaPho] = await Promise.all([
@@ -157,14 +179,17 @@ const Filters: React.FC = () => {
       setLoading(false);
     }
   };
-  const handleOnSubmit = (data: any) => {
-    addFilterPho(data);
+  const handleOnSubmit = async (data: any) => {
+    setPaginaActual(1); // Reset page to 1 on new search
     setFormData(data);
+    await addFilterPho({ ...data, page: 1 });
   };
 
-  const changePaginator = (page: number) => {
+  const changePaginator = async (page: number) => {
     setPaginaActual(page);
-    addFilterPho(formData);
+    const updatedFormData = { ...formData, page };
+    setFormData(updatedFormData);
+    await addFilterPho(updatedFormData);
   };
 
   return (
@@ -202,6 +227,8 @@ const Filters: React.FC = () => {
                           style={{ width: "100%" }}
                           dropdownStyle={{ borderColor: "#1890ff" }}
                         >
+                          <Option value="">Seleccionar</Option>
+
                           {dataMisiones.map((mision: any) => (
                             <Option
                               key={mision.id}
@@ -322,6 +349,7 @@ const Filters: React.FC = () => {
                           style={{ width: "100%" }}
                           dropdownStyle={{ borderColor: "#1890ff" }}
                         >
+                          <Option value="">Seleccionar</Option>
                           <Option value="1">Captura Imagen</Option>
                           <Option value="2">Encuesta</Option>
                           <Option value="3">Portafolio</Option>
@@ -428,6 +456,26 @@ const Filters: React.FC = () => {
                             </Option>
                           ))}
                         </Select>
+                      )}
+                    />
+                  </Form.Item>
+                </Card>
+              </Col>
+              <Col xs={24} sm={12} lg={4}>
+                <Card hoverable>
+                  <Form.Item label="gerente Venta">
+                    <Controller
+                      name="gdv"
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          {...field}
+                          placeholder="Escribir gerente Venta"
+                          style={{ width: "100%" }}
+                          onChange={(e) =>
+                            handleInputChange("gdv", e.target.value)
+                          }
+                        />
                       )}
                     />
                   </Form.Item>
@@ -552,43 +600,24 @@ const Filters: React.FC = () => {
                   </Form.Item>
                 </Card>
               </Col>
+
               <Col xs={24} sm={12} lg={4}>
                 <Card hoverable>
-                  <Form.Item label="gerente Venta">
-                    <Controller
-                      name="gdv"
-                      control={control}
-                      render={({ field }) => (
-                        <Input
-                          {...field}
-                          placeholder="Escribir gerente Venta"
-                          style={{ width: "100%" }}
-                          onChange={(e) =>
-                            handleInputChange("gdv", e.target.value)
-                          }
-                        />
-                      )}
-                    />
-                  </Form.Item>
-                </Card>
-              </Col>
-              <Col xs={24} sm={12} lg={4}>
-                <Card hoverable>
-                  <Form.Item label="Imagenes por pagina">
+                  <Form.Item label="Imágenes por página">
                     <Controller
                       name="pageSize"
                       control={control}
                       render={({ field }) => (
                         <Select
                           {...field}
-                          placeholder="Total IAmgenes"
+                          placeholder="Total Imágenes"
                           style={{ width: "100%" }}
                           dropdownStyle={{ borderColor: "#1890ff" }}
                         >
                           <Option value={100}>100</Option>
                           <Option value={500}>500</Option>
-                          <Option value={1000}>1.000</Option>
-                          <Option value={100000}>100.000</Option>
+                          {/* <Option value={1000}>1.000</Option>
+                          <Option value={100000}>100.000</Option> */}
                         </Select>
                       )}
                     />
@@ -609,16 +638,29 @@ const Filters: React.FC = () => {
             </div>
           </Panel>
         </Collapse>
-        <Divider />
-       {loading ? (
-        <div className="loading-container">
-          <img
-            src="/Postobon1.png"
-            className="loading-logo blinking"
-            alt="Loading logo"
-          />
-          <div className="loading-text">Cargando...</div>
+        <br />
+
+        <div style={{ textAlign: "center" }}>
+          {imgxPagina > 0 && (
+            <Pagination
+              onChange={(page) => {
+                changePaginator(page);
+              }}
+              defaultCurrent={paginaActual}
+              total={imgxPagina}
+            ></Pagination>
+          )}
         </div>
+        <Divider />
+        {loading ? (
+          <div className="loading-container">
+            <img
+              src="/Postobon1.png"
+              className="loading-logo blinking"
+              alt="Loading logo"
+            />
+            <div className="loading-text">Cargando...</div>
+          </div>
         ) : (
           <Row gutter={[16, 16]}>
             {photos.map((photo: any, index: any) => (
@@ -626,15 +668,18 @@ const Filters: React.FC = () => {
             ))}
           </Row>
         )}
-        {imgxPagina > 0 && (
-          <Pagination
-            onChange={(page) => {
-              changePaginator(page);
-            }}
-            defaultCurrent={paginaActual}
-            total={imgxPagina}
-          ></Pagination>
-        )}
+        <Divider />
+        <div style={{ textAlign: "center" }}>
+          {imgxPagina > 0 && (
+            <Pagination
+              onChange={(page) => {
+                changePaginator(page);
+              }}
+              defaultCurrent={paginaActual}
+              total={imgxPagina}
+            ></Pagination>
+          )}
+        </div>
       </Form>
     </div>
   );

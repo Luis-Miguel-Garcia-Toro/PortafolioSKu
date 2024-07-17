@@ -8,7 +8,7 @@ interface ClientData {
   nombreBodega: string;
   nombreMision: string;
   vendorCode: string;
-  verdict?: string | null;
+  veredicto?: string | null;
   zonaRDV?: string | null;
 }
 
@@ -34,21 +34,18 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ photoUrl, clientData }) => {
               </p>
 
               <p style={{ margin: 0 }}>
-                <strong>Zona:</strong> {clientData.zonaRDV}
+                <strong>Zona:</strong> {clientData.zonaRDV ? clientData.zonaRDV : "Sin Zona"}
               </p>
               <p style={{ margin: 0 }}>
-                <strong>Nombre Cedi:</strong> {clientData.nombreBodega}
+                <strong>Nombre Cedi:</strong> {clientData.nombreBodega ? clientData.nombreBodega : "Sin nombre Cedi" }
               </p>
               <p style={{ margin: 0 }}>
-                <strong>Nombre Misión:</strong> {clientData.nombreMision}
+                <strong>Nombre Misión:</strong> {clientData.nombreMision ? clientData.nombreMision : "Sin Nombre de Misión"}
               </p>
-              {clientData.verdict && (
                 <p style={{ margin: 0 }}>
-                  <strong>Veredicto:</strong> {clientData.verdict}
-                  console.log(clientData.verdict)
+                  <strong>Veredicto:</strong> {clientData.veredicto ? clientData.veredicto: "Sin veredicto"}                  
                 </p>
                 
-              )}
               
             </div>
           }
