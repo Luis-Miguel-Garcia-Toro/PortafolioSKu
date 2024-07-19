@@ -44,6 +44,7 @@ const Filters: React.FC = () => {
   const [dataTipoMotor, setdataTipoMotor] = useState<any>([]);
   const [dataRegional, setdataRegional] = useState<any>([]);
   const [dataBodega, setdataBodega] = useState<any>([]);
+  const [bodega, setBodega] = useState<any>([]);
   const [dataAgrupaMotor, setdataAgrupaMotor] = useState<any>([]);
   // const [dataFechaFin, setdataFechaFin] = useState<any>([]);
   const [paginaActual, setPaginaActual] = useState(1);
@@ -71,6 +72,7 @@ const Filters: React.FC = () => {
         setdataAgrupaMotor(dataAgrupaMotor.data);
         // console.log(dataAgrupaMotor, "agrupador]Motro");
         setdataBodega(bodegaResponse.data);
+        setBodega(bodegaResponse.data)
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -115,13 +117,12 @@ const Filters: React.FC = () => {
       );
       setValue("codigoRegional", selecteRegional.codigo);
 
-      const selectedBodega = dataBodega.filter(
+      const selectedBodega = bodega.filter(
         (bodega: any) => bodega.codigoRegional == selectRegional
       );
       setdataBodega(selectedBodega);
       setValue("bodega", selectedBodega);
 
-      console.log(selectedBodega, "bodega seleccionada");
     }
     if (selectedMissionId && dataMisiones.length > 0) {
       const selectedMission = dataMisiones.find(
