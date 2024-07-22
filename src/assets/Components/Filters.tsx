@@ -309,7 +309,6 @@ const Filters: React.FC = () => {
                   </Form.Item>
                 </Card>
               </Col>
-              {/* /////// pendiente  */}
               <Col xs={24} sm={12} lg={4}>
                 <Card hoverable>
                   <Form.Item label="Agrupador Motor">
@@ -469,14 +468,16 @@ const Filters: React.FC = () => {
                       name="gdv"
                       control={control}
                       render={({ field }) => (
-                        <Input
-                          {...field}
-                          placeholder="Escribir gerente Venta"
-                          style={{ width: "100%" }}
-                          onChange={(e) =>
-                            handleInputChange("gdv", e.target.value)
-                          }
-                        />
+                        <Select
+                        {...field}
+                        placeholder="Seleccionar gerente de Ventas"
+                        style={{ width: "100%" }}
+                        dropdownStyle={{ borderColor: "#1890ff" }}
+                      >
+                        <Option value="">Seleccionar</Option>
+                        <Option value="true">c</Option>
+                        <Option value="false">c</Option>
+                      </Select>
                       )}
                     />
                   </Form.Item>
@@ -489,14 +490,16 @@ const Filters: React.FC = () => {
                       name="jdv"
                       control={control}
                       render={({ field }) => (
-                        <Input
-                          {...field}
-                          placeholder="Escribir Jefe Ventas"
-                          style={{ width: "100%" }}
-                          onChange={(e) =>
-                            handleInputChange("jdv", e.target.value)
-                          }
-                        />
+                        <Select
+                        {...field}
+                        placeholder="Seleccionar Jefe Ventas"
+                        style={{ width: "100%" }}
+                        dropdownStyle={{ borderColor: "#1890ff" }}
+                      >
+                        <Option value="">Seleccionar</Option>
+                        <Option value="true">c</Option>
+                        <Option value="false">c</Option>
+                      </Select>
                       )}
                     />
                   </Form.Item>
@@ -509,14 +512,16 @@ const Filters: React.FC = () => {
                       name="sdv"
                       control={control}
                       render={({ field }) => (
-                        <Input
-                          {...field}
-                          placeholder="Escribir Supervisor"
-                          style={{ width: "100%" }}
-                          onChange={(e) =>
-                            handleInputChange("sdv", e.target.value)
-                          }
-                        />
+                        <Select
+                        {...field}
+                        placeholder="Seleccionar Supervisor"
+                        style={{ width: "100%" }}
+                        dropdownStyle={{ borderColor: "#1890ff" }}
+                      >
+                        <Option value="">Seleccionar</Option>
+                        <Option value="true">c</Option>
+                        <Option value="false">c</Option>
+                      </Select>
                       )}
                     />
                   </Form.Item>
@@ -529,14 +534,16 @@ const Filters: React.FC = () => {
                       name="zonaRDV"
                       control={control}
                       render={({ field }) => (
-                        <Input
-                          {...field}
-                          placeholder="Escribir zonaRDV"
-                          style={{ width: "100%" }}
-                          onChange={(e) =>
-                            handleInputChange("zonaRDV", e.target.value)
-                          }
-                        />
+                        <Select
+                        {...field}
+                        placeholder="Seleccionar Zona"
+                        style={{ width: "100%" }}
+                        dropdownStyle={{ borderColor: "#1890ff" }}
+                      >
+                        <Option value="">Seleccionar</Option>
+                        <Option value="true">c</Option>
+                        <Option value="false">c</Option>
+                      </Select>
                       )}
                     />
                   </Form.Item>
@@ -549,14 +556,16 @@ const Filters: React.FC = () => {
                       name="rdv"
                       control={control}
                       render={({ field }) => (
-                        <Input
-                          {...field}
-                          placeholder="Escribir rdv"
-                          style={{ width: "100%" }}
-                          onChange={(e) =>
-                            handleInputChange("rdv", e.target.value)
-                          }
-                        />
+                        <Select
+                        {...field}
+                        placeholder="Seleccionar RDV"
+                        style={{ width: "100%" }}
+                        dropdownStyle={{ borderColor: "#1890ff" }}
+                      >
+                        <Option value="">Seleccionar</Option>
+                        <Option value="true">c</Option>
+                        <Option value="false">c</Option>
+                      </Select>
                       )}
                     />
                   </Form.Item>
@@ -569,14 +578,16 @@ const Filters: React.FC = () => {
                       name="codigoCliente"
                       control={control}
                       render={({ field }) => (
-                        <Input
-                          {...field}
-                          placeholder="Escribir Código Cliente"
-                          style={{ width: "100%" }}
-                          onChange={(e) =>
-                            handleInputChange("codigoCliente", e.target.value)
-                          }
-                        />
+                        <Select
+                        {...field}
+                        placeholder="Seleccionar Código Cliente"
+                        style={{ width: "100%" }}
+                        dropdownStyle={{ borderColor: "#1890ff" }}
+                      >
+                        <Option value="">Seleccionar</Option>
+                        <Option value="true">c</Option>
+                        <Option value="false">c</Option>
+                      </Select>
                       )}
                     />
                   </Form.Item>
@@ -589,13 +600,16 @@ const Filters: React.FC = () => {
                       name="nombreNegocio"
                       control={control}
                       render={({ field }) => (
-                        <Input
-                          {...field}
-                          placeholder="Escribir el nombre del negocio"
-                          onChange={(e) =>
-                            handleInputChange("nombreNegocio", e.target.value)
-                          }
-                        />
+                        <Select
+                        {...field}
+                        placeholder="Seleccionar Nombre Negocio"
+                        style={{ width: "100%" }}
+                        dropdownStyle={{ borderColor: "#1890ff" }}
+                      >
+                        <Option value="">Seleccionar</Option>
+                        <Option value="true">c</Option>
+                        <Option value="false">c</Option>
+                      </Select>
                       )}
                     />
                   </Form.Item>
