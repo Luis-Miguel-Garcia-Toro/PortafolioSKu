@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from "react";
 import {
   Select,
@@ -8,7 +10,6 @@ import {
   Divider,
   Button,
   Collapse,
-  Input,
   Pagination,
   DatePicker,
 } from "antd";
@@ -17,24 +18,13 @@ import UserServices from "../Services/Sevices"; // Ensure the path is correct
 import "../../Styles/Skeleton.scss";
 
 import PhotoCard from "./PhotoCard";
-import dayjs from "dayjs";
-import customParseFormat from "dayjs/plugin/customParseFormat";
+import moment from "moment";
 
+const now = moment();
+console.log(now.format("YYYY-MM-DD"));
 const { Option } = Select;
 const { Panel } = Collapse;
 const dateFormat = "YYYY-MM-DD";
-interface ClientData {
-  clientId: string;
-  region: string;
-  regional: string;
-  cediName: string;
-  vendorCode: string;
-}
-
-interface PhotoData {
-  url: string;
-  clientData: ClientData;
-}
 
 const Filters: React.FC = () => {
   const [expandFilters, setExpandFilters] = useState(false);
@@ -70,9 +60,8 @@ const Filters: React.FC = () => {
         setdataTipoMotor(tipoMotorResponse.data);
         setdataRegional(regionalResponse.data);
         setdataAgrupaMotor(dataAgrupaMotor.data);
-        // console.log(dataAgrupaMotor, "agrupador]Motro");
         setdataBodega(bodegaResponse.data);
-        setBodega(bodegaResponse.data)
+        setBodega(bodegaResponse.data);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -82,14 +71,34 @@ const Filters: React.FC = () => {
 
     fetchData();
   }, []);
-
-  const { control, handleSubmit, watch, setValue } = useForm({
+  interface FormValues {
+    misionId: number | null;
+    fechaInicio: Date | null;
+    fechaFin: Date | null;
+    motorId: number | null;
+    agrupadorMotor: number | null;
+    tipoMision: string;
+    codigoRegional: string;
+    bodega: string;
+    nombreMision: string;
+    nombreNegocio: string;
+    codigoCliente: string;
+    jdv: string;
+    sdv: string;
+    rdv: string;
+    gdv: string;
+    zonaRDV: string;
+    veredict: string;
+    page: number;
+    pageSize: number;
+  }
+  const { control, handleSubmit, watch, setValue } = useForm<FormValues>({
     defaultValues: {
       misionId: null,
-      fechaInicio: null,
-      fechaFin: null,
-      motorId: null as number | null,
-      agrupadorMotor: null as number | null,
+      fechaInicio: null, // Start as null, or new Date() for a default current date
+      fechaFin: null, // Same as above
+      motorId: null,
+      agrupadorMotor: null,
       tipoMision: "",
       codigoRegional: "",
       bodega: "",
@@ -102,7 +111,7 @@ const Filters: React.FC = () => {
       gdv: "",
       zonaRDV: "",
       veredict: "",
-      page: paginaActual,
+      page: paginaActual, // Assuming paginaActual is a number and defined
       pageSize: 100,
     },
   });
@@ -122,7 +131,6 @@ const Filters: React.FC = () => {
       );
       setdataBodega(selectedBodega);
       setValue("bodega", selectedBodega);
-
     }
     if (selectedMissionId && dataMisiones.length > 0) {
       const selectedMission = dataMisiones.find(
@@ -143,8 +151,11 @@ const Filters: React.FC = () => {
             ? Number(selectedMission.agrupadorMotor)
             : null
         );
-        setValue("fechaInicio", selectedMission.fechaInicio);
-        setValue("fechaFin", selectedMission.fechaFin);
+        const startDate = new Date(selectedMission.fechaInicio);
+        const endDate = new Date(selectedMission.fechaFin);
+
+        setValue("fechaInicio", startDate);
+        setValue("fechaFin", endDate);
         setValue("misionId", selectedMission.id);
         setValue("nombreMision", selectedMission.nombreMision);
         setValue("nombreMision", selectedMission.nombreMision);
@@ -161,9 +172,9 @@ const Filters: React.FC = () => {
     setExpandFilters(!expandFilters);
   };
 
-  const handleInputChange = (fieldName: any, value: any) => {
-    setValue(fieldName, value);
-    // console.log(fieldName, value, "input" )
+  const handleInputChange = (fieldName: any, date: moment.Moment | null) => {
+    // Convertimos el objeto de moment a Date de JavaScript si no es null
+    setValue(fieldName, date ? date.toDate() : null);
   };
   const addFilterPho = async (data: any) => {
     try {
@@ -252,12 +263,16 @@ const Filters: React.FC = () => {
                       name="fechaInicio"
                       control={control}
                       render={({ field }) => (
-                        <Select
+                        <DatePicker
                           {...field}
+                          format={dateFormat}
                           placeholder="Fecha inicial"
                           style={{ width: "100%" }}
-                          dropdownStyle={{ borderColor: "#1890ff" }}
-                        ></Select>
+                          onChange={(date) =>
+                            handleInputChange("fechaInicio", date)
+                          }
+                          value={field.value ? moment(field.value) : null}
+                        />
                       )}
                     />
                   </Form.Item>
@@ -270,15 +285,16 @@ const Filters: React.FC = () => {
                       name="fechaFin"
                       control={control}
                       render={({ field }) => (
-                        <Select
+                        <DatePicker
                           {...field}
+                          format={dateFormat}
                           placeholder="Fecha Final"
                           style={{ width: "100%" }}
-                          dropdownStyle={{ borderColor: "#1890ff" }}
-                        >
-                          {/* <Option value="mision1">Misión 1</Option> */}
-                          {/* <Option value="mision2">Misión 2</Option> */}
-                        </Select>
+                          onChange={(date) =>
+                            handleInputChange("fechaFin", date)
+                          }
+                          value={field.value ? moment(field.value) : null}
+                        />
                       )}
                     />
                   </Form.Item>
@@ -469,15 +485,15 @@ const Filters: React.FC = () => {
                       control={control}
                       render={({ field }) => (
                         <Select
-                        {...field}
-                        placeholder="Seleccionar gerente de Ventas"
-                        style={{ width: "100%" }}
-                        dropdownStyle={{ borderColor: "#1890ff" }}
-                      >
-                        <Option value="">Seleccionar</Option>
-                        <Option value="true">c</Option>
-                        <Option value="false">c</Option>
-                      </Select>
+                          {...field}
+                          placeholder="Seleccionar gerente de Ventas"
+                          style={{ width: "100%" }}
+                          dropdownStyle={{ borderColor: "#1890ff" }}
+                        >
+                          <Option value="">Seleccionar</Option>
+                          <Option value="true">c</Option>
+                          <Option value="false">c</Option>
+                        </Select>
                       )}
                     />
                   </Form.Item>
@@ -491,15 +507,15 @@ const Filters: React.FC = () => {
                       control={control}
                       render={({ field }) => (
                         <Select
-                        {...field}
-                        placeholder="Seleccionar Jefe Ventas"
-                        style={{ width: "100%" }}
-                        dropdownStyle={{ borderColor: "#1890ff" }}
-                      >
-                        <Option value="">Seleccionar</Option>
-                        <Option value="true">c</Option>
-                        <Option value="false">c</Option>
-                      </Select>
+                          {...field}
+                          placeholder="Seleccionar Jefe Ventas"
+                          style={{ width: "100%" }}
+                          dropdownStyle={{ borderColor: "#1890ff" }}
+                        >
+                          <Option value="">Seleccionar</Option>
+                          <Option value="true">c</Option>
+                          <Option value="false">c</Option>
+                        </Select>
                       )}
                     />
                   </Form.Item>
@@ -513,15 +529,15 @@ const Filters: React.FC = () => {
                       control={control}
                       render={({ field }) => (
                         <Select
-                        {...field}
-                        placeholder="Seleccionar Supervisor"
-                        style={{ width: "100%" }}
-                        dropdownStyle={{ borderColor: "#1890ff" }}
-                      >
-                        <Option value="">Seleccionar</Option>
-                        <Option value="true">c</Option>
-                        <Option value="false">c</Option>
-                      </Select>
+                          {...field}
+                          placeholder="Seleccionar Supervisor"
+                          style={{ width: "100%" }}
+                          dropdownStyle={{ borderColor: "#1890ff" }}
+                        >
+                          <Option value="">Seleccionar</Option>
+                          <Option value="true">c</Option>
+                          <Option value="false">c</Option>
+                        </Select>
                       )}
                     />
                   </Form.Item>
@@ -535,15 +551,15 @@ const Filters: React.FC = () => {
                       control={control}
                       render={({ field }) => (
                         <Select
-                        {...field}
-                        placeholder="Seleccionar Zona"
-                        style={{ width: "100%" }}
-                        dropdownStyle={{ borderColor: "#1890ff" }}
-                      >
-                        <Option value="">Seleccionar</Option>
-                        <Option value="true">c</Option>
-                        <Option value="false">c</Option>
-                      </Select>
+                          {...field}
+                          placeholder="Seleccionar Zona"
+                          style={{ width: "100%" }}
+                          dropdownStyle={{ borderColor: "#1890ff" }}
+                        >
+                          <Option value="">Seleccionar</Option>
+                          <Option value="true">c</Option>
+                          <Option value="false">c</Option>
+                        </Select>
                       )}
                     />
                   </Form.Item>
@@ -557,15 +573,15 @@ const Filters: React.FC = () => {
                       control={control}
                       render={({ field }) => (
                         <Select
-                        {...field}
-                        placeholder="Seleccionar RDV"
-                        style={{ width: "100%" }}
-                        dropdownStyle={{ borderColor: "#1890ff" }}
-                      >
-                        <Option value="">Seleccionar</Option>
-                        <Option value="true">c</Option>
-                        <Option value="false">c</Option>
-                      </Select>
+                          {...field}
+                          placeholder="Seleccionar RDV"
+                          style={{ width: "100%" }}
+                          dropdownStyle={{ borderColor: "#1890ff" }}
+                        >
+                          <Option value="">Seleccionar</Option>
+                          <Option value="true">c</Option>
+                          <Option value="false">c</Option>
+                        </Select>
                       )}
                     />
                   </Form.Item>
@@ -579,15 +595,15 @@ const Filters: React.FC = () => {
                       control={control}
                       render={({ field }) => (
                         <Select
-                        {...field}
-                        placeholder="Seleccionar Código Cliente"
-                        style={{ width: "100%" }}
-                        dropdownStyle={{ borderColor: "#1890ff" }}
-                      >
-                        <Option value="">Seleccionar</Option>
-                        <Option value="true">c</Option>
-                        <Option value="false">c</Option>
-                      </Select>
+                          {...field}
+                          placeholder="Seleccionar Código Cliente"
+                          style={{ width: "100%" }}
+                          dropdownStyle={{ borderColor: "#1890ff" }}
+                        >
+                          <Option value="">Seleccionar</Option>
+                          <Option value="true">c</Option>
+                          <Option value="false">c</Option>
+                        </Select>
                       )}
                     />
                   </Form.Item>
@@ -601,15 +617,15 @@ const Filters: React.FC = () => {
                       control={control}
                       render={({ field }) => (
                         <Select
-                        {...field}
-                        placeholder="Seleccionar Nombre Negocio"
-                        style={{ width: "100%" }}
-                        dropdownStyle={{ borderColor: "#1890ff" }}
-                      >
-                        <Option value="">Seleccionar</Option>
-                        <Option value="true">c</Option>
-                        <Option value="false">c</Option>
-                      </Select>
+                          {...field}
+                          placeholder="Seleccionar Nombre Negocio"
+                          style={{ width: "100%" }}
+                          dropdownStyle={{ borderColor: "#1890ff" }}
+                        >
+                          <Option value="">Seleccionar</Option>
+                          <Option value="true">c</Option>
+                          <Option value="false">c</Option>
+                        </Select>
                       )}
                     />
                   </Form.Item>
