@@ -36,10 +36,25 @@ const Filters: React.FC = () => {
   const [dataBodega, setdataBodega] = useState<any>([]);
   const [bodega, setBodega] = useState<any>([]);
   const [dataAgrupaMotor, setdataAgrupaMotor] = useState<any>([]);
-  // const [dataFechaFin, setdataFechaFin] = useState<any>([]);
   const [paginaActual, setPaginaActual] = useState(1);
   const [imgxPagina, setImgxPagina] = useState(0);
   const [formData, setFormData] = useState<any>(null);
+
+  const [dataGDV, setdataGDV] = useState<any>([]);
+  const [dataJDV, setdataJDV] = useState<any>([]);
+  const [dataSDV, setdataSDV] = useState<any>([]);
+  const [dataRDV, setdataRDV] = useState<any>([]);
+
+  const [formPost, setformPost] = useState<any>({
+    regional: "",
+    bodega: "",
+    codigoGdv:"" ,
+    codigoJdv:"" ,
+    codigoSdv:"" ,
+    codigoRdv:"" ,
+    zonaRdv: "",
+    companiaRdv: ""
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,11 +64,19 @@ const Filters: React.FC = () => {
           tipoMotorResponse,
           regionalResponse,
           bodegaResponse,
+          GDVresponse,
+          JDVresponse,
+          SDVresponse,
+          RDVresponse,
         ] = await Promise.all([
           UserServices.GetImgMisiones(),
           UserServices.GetTipoMotor(),
           UserServices.GetRegional(),
           UserServices.GetBodega(),
+          UserServices.PostGDV(formPost),
+          UserServices.PostJDV(formPost),
+          UserServices.PostSDV(formPost),
+          UserServices.PostRDV(formPost),
         ]);
 
         setdataMisiones(misionesResponse.data);
@@ -61,7 +84,12 @@ const Filters: React.FC = () => {
         setdataRegional(regionalResponse.data);
         setdataAgrupaMotor(dataAgrupaMotor.data);
         setdataBodega(bodegaResponse.data);
-        setBodega(bodegaResponse.data);
+        setdataGDV(GDVresponse.data);
+        setdataJDV(JDVresponse.data);
+        setdataSDV(SDVresponse.data);
+        setdataRDV(RDVresponse.data);
+
+        //
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -490,9 +518,12 @@ const Filters: React.FC = () => {
                           style={{ width: "100%" }}
                           dropdownStyle={{ borderColor: "#1890ff" }}
                         >
-                          <Option value="">Seleccionar</Option>
-                          <Option value="true">c</Option>
-                          <Option value="false">c</Option>
+                       <Option value="">Seleccionar</Option>
+                          {dataGDV.map((GDV: any) => (
+                            <Option key={GDV.codigo} value={GDV.codigo}>
+                              {GDV.nombre}
+                            </Option>
+                          ))}
                         </Select>
                       )}
                     />
@@ -512,9 +543,12 @@ const Filters: React.FC = () => {
                           style={{ width: "100%" }}
                           dropdownStyle={{ borderColor: "#1890ff" }}
                         >
-                          <Option value="">Seleccionar</Option>
-                          <Option value="true">c</Option>
-                          <Option value="false">c</Option>
+                           <Option value="">Seleccionar</Option>
+                          {dataJDV.map((JDV: any) => (
+                            <Option key={JDV.codigo} value={JDV.codigo}>
+                              {JDV.nombre}
+                            </Option>
+                          ))}
                         </Select>
                       )}
                     />
@@ -534,16 +568,19 @@ const Filters: React.FC = () => {
                           style={{ width: "100%" }}
                           dropdownStyle={{ borderColor: "#1890ff" }}
                         >
-                          <Option value="">Seleccionar</Option>
-                          <Option value="true">c</Option>
-                          <Option value="false">c</Option>
+                        <Option value="">Seleccionar</Option>
+                          {dataSDV.map((SDV: any) => (
+                            <Option key={SDV.codigo} value={SDV.codigo}>
+                              {SDV.nombre}
+                            </Option>
+                          ))}
                         </Select>
                       )}
                     />
                   </Form.Item>
                 </Card>
               </Col>
-              <Col xs={24} sm={12} lg={4}>
+              {/* <Col xs={24} sm={12} lg={4}>
                 <Card hoverable>
                   <Form.Item label="Zona Representantes">
                     <Controller
@@ -564,7 +601,7 @@ const Filters: React.FC = () => {
                     />
                   </Form.Item>
                 </Card>
-              </Col>
+              </Col> */}
               <Col xs={24} sm={12} lg={4}>
                 <Card hoverable>
                   <Form.Item label="RDV">
@@ -578,9 +615,11 @@ const Filters: React.FC = () => {
                           style={{ width: "100%" }}
                           dropdownStyle={{ borderColor: "#1890ff" }}
                         >
-                          <Option value="">Seleccionar</Option>
-                          <Option value="true">c</Option>
-                          <Option value="false">c</Option>
+                             {dataRDV.map((rdv: any) => (
+                            <Option key={rdv.id} value={rdv.id}>
+                              {rdv.nombre}
+                            </Option>
+                          ))}
                         </Select>
                       )}
                     />

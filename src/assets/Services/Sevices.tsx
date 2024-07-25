@@ -72,20 +72,60 @@ const UserServices = {
         throw e;
       });
   },
-  // PostSearchPho: (data:any) => {
-  //   return axiosInstance
-  //     .post(`${baseUrl.url}/ImageEverest/Filtrar`,data)
-  //     .then((res) => {
-  //       let r = res.data;
-  //       console.log(r,"defefrfrfrffrfrf")
-  //       return r;
-  //     })
+  PostGDV: (data:any) => {
+    return axiosInstance
+      .post(`${baseUrl.url}/ImageEverest/getGDV`,data)
+      .then((res) => {
+        let r = res.data;
+        return r;
+      })
 
-  //     .catch((e) => {
-  //       console.error(e);
-  //       throw e;
-  //     });
-  // },
+      .catch((e) => {
+        console.error(e);
+        throw e;
+      });
+  },
+  //POST//
+  PostJDV: (data:any) => {
+    return axiosInstance
+      .post(`${baseUrl.url}/ImageEverest/getJDV`,data)
+      .then((res) => {
+        let r = res.data;
+        return r;
+      })
+
+      .catch((e) => {
+        console.error(e);
+        throw e;
+      });
+  },
+  PostSDV: (data:any) => {
+    return axiosInstance
+      .post(`${baseUrl.url}/ImageEverest/getJDV`,data)
+      .then((res) => {
+        let r = res.data;
+        return r;
+      })
+
+      .catch((e) => {
+        console.error(e);
+        throw e;
+      });
+  },
+  PostRDV: (data:any) => {
+    return axiosInstance
+      .post(`${baseUrl.url}/ImageEverest/getRDV`,data)
+      .then((res) => {
+        let r = res.data;
+        return r;
+      })
+
+      .catch((e) => {
+        console.error(e);
+        throw e;
+      });
+  },
+
 };
 
 export default UserServices;
