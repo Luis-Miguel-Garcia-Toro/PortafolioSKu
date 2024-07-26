@@ -40,7 +40,6 @@ const Filters: React.FC = () => {
   const [paginaActual, setPaginaActual] = useState(1);
   const [imgxPagina, setImgxPagina] = useState(0);
   const [formData, setFormData] = useState<any>(null);
-  const [dataEstado, setdataEstado] = useState<any>([]);
 
   const [dataGDV, setdataGDV] = useState<any>([]);
   const [dataJDV, setdataJDV] = useState<any>([]);
@@ -90,7 +89,6 @@ const Filters: React.FC = () => {
         setdataJDV(JDVresponse.data);
         setdataSDV(SDVresponse.data);
         setdataRDV(RDVresponse.data);
-        setdataEstado(misionesResponse.data);
 
         //
       } catch (error) {
@@ -191,7 +189,7 @@ const Filters: React.FC = () => {
         setValue("fechaFin", endDate);
         setValue("misionId", selectedMission.id);
         setValue("nombreMision", selectedMission.nombreMision);
-        setValue("nombreMision", selectedMission.nombreMision);
+        setValue("estado", selectedMission.estado);
       }
     }
   }, [
@@ -427,15 +425,9 @@ const Filters: React.FC = () => {
                           style={{ width: "100%" }}
                           dropdownStyle={{ borderColor: "#1890ff" }}
                         >
-                          {/* Opción vacía para mostrar el placeholder */}
                           <Option value="">Seleccionar</Option>
-
-                          {/* Mapeo de las opciones */}
-                          {dataEstado.map((estado: any) => (
-                            <Option key={estado} value={estado}>
-                              {estado}
-                            </Option>
-                          ))}
+                          <Option value="1">Aprobado</Option>
+                          <Option value="0">No Aprobado</Option>
                         </Select>
                       )}
                     />
