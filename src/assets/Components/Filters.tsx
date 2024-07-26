@@ -35,7 +35,7 @@ const Filters: React.FC = () => {
   const [dataTipoMotor, setdataTipoMotor] = useState<any>([]);
   const [dataRegional, setdataRegional] = useState<any>([]);
   const [dataBodega, setdataBodega] = useState<any>([]);
-  const [bodega, setBodega] = useState<any>([]);
+  const [bodega] = useState<any>([]);
   const [dataAgrupaMotor, setdataAgrupaMotor] = useState<any>([]);
   const [paginaActual, setPaginaActual] = useState(1);
   const [imgxPagina, setImgxPagina] = useState(0);
@@ -46,7 +46,7 @@ const Filters: React.FC = () => {
   const [dataSDV, setdataSDV] = useState<any>([]);
   const [dataRDV, setdataRDV] = useState<any>([]);
 
-  const [formPost, setformPost] = useState<any>({
+  const [formPost] = useState<any>({
     regional: "",
     bodega: "",
     codigoGdv: "",
@@ -238,6 +238,11 @@ const Filters: React.FC = () => {
   const NombreNegocio = (fieldName: any, e: any | null) => {
     // Convertimos el objeto de moment a Date de JavaScript si no es null
     setValue(fieldName, e ? e : "");
+  };
+  const Observers = {
+    gdv: watch("gdv"),
+    jdv: watch("jdv"),
+    supervisor: watch("sdv"),
   };
 
   return (
@@ -551,6 +556,9 @@ const Filters: React.FC = () => {
                           placeholder="Seleccionar Jefe Ventas"
                           style={{ width: "100%" }}
                           dropdownStyle={{ borderColor: "#1890ff" }}
+                          disabled={
+                            Observers.gdv === "" || Observers.gdv === null
+                          }
                         >
                           <Option value="">Seleccionar</Option>
                           {dataJDV.map((JDV: any) => (
@@ -575,6 +583,9 @@ const Filters: React.FC = () => {
                           {...field}
                           placeholder="Seleccionar Supervisor"
                           style={{ width: "100%" }}
+                          disabled={
+                            Observers.jdv === "" || Observers.jdv === null
+                          }
                           dropdownStyle={{ borderColor: "#1890ff" }}
                         >
                           <Option value="">Seleccionar</Option>
@@ -600,8 +611,13 @@ const Filters: React.FC = () => {
                           {...field}
                           placeholder="Seleccionar RDV"
                           style={{ width: "100%" }}
+                          disabled={
+                            Observers.supervisor === "" ||
+                            Observers.supervisor === null
+                          }
                           dropdownStyle={{ borderColor: "#1890ff" }}
                         >
+                          <Option value="">Seleccionar</Option>
                           {dataRDV.map((rdv: any) => (
                             <Option key={rdv.id} value={rdv.id}>
                               {rdv.nombre}
