@@ -35,7 +35,7 @@ const Filters: React.FC = () => {
   const [dataTipoMotor, setdataTipoMotor] = useState<any>([]);
   const [dataRegional, setdataRegional] = useState<any>([]);
   const [dataBodega, setdataBodega] = useState<any>([]);
-  const [bodega] = useState<any>([]);
+  const [bodega, setBodega] = useState<any>([]);
   const [dataAgrupaMotor, setdataAgrupaMotor] = useState<any>([]);
   const [paginaActual, setPaginaActual] = useState(1);
   const [imgxPagina, setImgxPagina] = useState(0);
@@ -56,7 +56,6 @@ const Filters: React.FC = () => {
     zonaRdv: "",
     companiaRdv: "",
   });
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -64,7 +63,7 @@ const Filters: React.FC = () => {
           misionesResponse,
           tipoMotorResponse,
           regionalResponse,
-          bodegaResponse,
+          bodegaResponse, // Fetching bodega data here
           GDVresponse,
           JDVresponse,
           SDVresponse,
@@ -90,7 +89,8 @@ const Filters: React.FC = () => {
         setdataSDV(SDVresponse.data);
         setdataRDV(RDVresponse.data);
 
-        //
+        // Ensure that bodega is set with the initial data
+        setBodega(bodegaResponse.data);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -557,7 +557,9 @@ const Filters: React.FC = () => {
                           style={{ width: "100%" }}
                           dropdownStyle={{ borderColor: "#1890ff" }}
                           disabled={
-                            Observers.gdv === "" || Observers.gdv === null
+                            Observers.gdv === "" ||
+                            Observers.gdv === null ||
+                            Observers.gdv === undefined
                           }
                         >
                           <Option value="">Seleccionar</Option>
