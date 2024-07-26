@@ -12,6 +12,7 @@ import {
   Collapse,
   Pagination,
   DatePicker,
+  Input,
 } from "antd";
 import { useForm, Controller } from "react-hook-form";
 import UserServices from "../Services/Sevices"; // Ensure the path is correct
@@ -39,6 +40,7 @@ const Filters: React.FC = () => {
   const [paginaActual, setPaginaActual] = useState(1);
   const [imgxPagina, setImgxPagina] = useState(0);
   const [formData, setFormData] = useState<any>(null);
+  const [dataEstado, setdataEstado] = useState<any>([]);
 
   const [dataGDV, setdataGDV] = useState<any>([]);
   const [dataJDV, setdataJDV] = useState<any>([]);
@@ -48,12 +50,12 @@ const Filters: React.FC = () => {
   const [formPost, setformPost] = useState<any>({
     regional: "",
     bodega: "",
-    codigoGdv:"" ,
-    codigoJdv:"" ,
-    codigoSdv:"" ,
-    codigoRdv:"" ,
+    codigoGdv: "",
+    codigoJdv: "",
+    codigoSdv: "",
+    codigoRdv: "",
     zonaRdv: "",
-    companiaRdv: ""
+    companiaRdv: "",
   });
 
   useEffect(() => {
@@ -88,6 +90,7 @@ const Filters: React.FC = () => {
         setdataJDV(JDVresponse.data);
         setdataSDV(SDVresponse.data);
         setdataRDV(RDVresponse.data);
+        setdataEstado(misionesResponse.data);
 
         //
       } catch (error) {
@@ -111,6 +114,7 @@ const Filters: React.FC = () => {
     nombreMision: string;
     nombreNegocio: string;
     codigoCliente: string;
+    estado: number | null;
     jdv: string;
     sdv: string;
     rdv: string;
@@ -133,6 +137,7 @@ const Filters: React.FC = () => {
       nombreMision: "",
       nombreNegocio: "",
       codigoCliente: "",
+      estado: null,
       jdv: "",
       sdv: "",
       rdv: "",
@@ -230,6 +235,11 @@ const Filters: React.FC = () => {
     const updatedFormData = { ...formData, page };
     setFormData(updatedFormData);
     await addFilterPho(updatedFormData);
+  };
+
+  const NombreNegocio = (fieldName: any, e: any | null) => {
+    // Convertimos el objeto de moment a Date de JavaScript si no es null
+    setValue(fieldName, e ? e : "");
   };
 
   return (
@@ -404,11 +414,11 @@ const Filters: React.FC = () => {
                   </Form.Item>
                 </Card>
               </Col>
-              {/* <Col xs={24} sm={12} lg={4}>
+              <Col xs={24} sm={12} lg={4}>
                 <Card hoverable>
                   <Form.Item label="Estado">
                     <Controller
-                      name="estado"              falta estadio
+                      name="estado"
                       control={control}
                       render={({ field }) => (
                         <Select
@@ -417,14 +427,21 @@ const Filters: React.FC = () => {
                           style={{ width: "100%" }}
                           dropdownStyle={{ borderColor: "#1890ff" }}
                         >
-                          <Option value="mision1">Misión 1</Option>
-                          <Option value="mision2">Misión 2</Option>
+                          {/* Opción vacía para mostrar el placeholder */}
+                          <Option value="">Seleccionar</Option>
+
+                          {/* Mapeo de las opciones */}
+                          {dataEstado.map((estado: any) => (
+                            <Option key={estado} value={estado}>
+                              {estado}
+                            </Option>
+                          ))}
                         </Select>
                       )}
                     />
                   </Form.Item>
                 </Card>
-              </Col> */}
+              </Col>
               <Col xs={24} sm={12} lg={4}>
                 <Card hoverable>
                   <Form.Item label="Veredicto">
@@ -518,7 +535,7 @@ const Filters: React.FC = () => {
                           style={{ width: "100%" }}
                           dropdownStyle={{ borderColor: "#1890ff" }}
                         >
-                       <Option value="">Seleccionar</Option>
+                          <Option value="">Seleccionar</Option>
                           {dataGDV.map((GDV: any) => (
                             <Option key={GDV.codigo} value={GDV.codigo}>
                               {GDV.nombre}
@@ -543,7 +560,7 @@ const Filters: React.FC = () => {
                           style={{ width: "100%" }}
                           dropdownStyle={{ borderColor: "#1890ff" }}
                         >
-                           <Option value="">Seleccionar</Option>
+                          <Option value="">Seleccionar</Option>
                           {dataJDV.map((JDV: any) => (
                             <Option key={JDV.codigo} value={JDV.codigo}>
                               {JDV.nombre}
@@ -568,7 +585,7 @@ const Filters: React.FC = () => {
                           style={{ width: "100%" }}
                           dropdownStyle={{ borderColor: "#1890ff" }}
                         >
-                        <Option value="">Seleccionar</Option>
+                          <Option value="">Seleccionar</Option>
                           {dataSDV.map((SDV: any) => (
                             <Option key={SDV.codigo} value={SDV.codigo}>
                               {SDV.nombre}
@@ -580,28 +597,6 @@ const Filters: React.FC = () => {
                   </Form.Item>
                 </Card>
               </Col>
-              {/* <Col xs={24} sm={12} lg={4}>
-                <Card hoverable>
-                  <Form.Item label="Zona Representantes">
-                    <Controller
-                      name="zonaRDV"
-                      control={control}
-                      render={({ field }) => (
-                        <Select
-                          {...field}
-                          placeholder="Seleccionar Zona"
-                          style={{ width: "100%" }}
-                          dropdownStyle={{ borderColor: "#1890ff" }}
-                        >
-                          <Option value="">Seleccionar</Option>
-                          <Option value="true">c</Option>
-                          <Option value="false">c</Option>
-                        </Select>
-                      )}
-                    />
-                  </Form.Item>
-                </Card>
-              </Col> */}
               <Col xs={24} sm={12} lg={4}>
                 <Card hoverable>
                   <Form.Item label="RDV">
@@ -615,7 +610,7 @@ const Filters: React.FC = () => {
                           style={{ width: "100%" }}
                           dropdownStyle={{ borderColor: "#1890ff" }}
                         >
-                             {dataRDV.map((rdv: any) => (
+                          {dataRDV.map((rdv: any) => (
                             <Option key={rdv.id} value={rdv.id}>
                               {rdv.nombre}
                             </Option>
@@ -633,16 +628,15 @@ const Filters: React.FC = () => {
                       name="codigoCliente"
                       control={control}
                       render={({ field }) => (
-                        <Select
+                        <Input
                           {...field}
-                          placeholder="Seleccionar Código Cliente"
+                          type="number"
+                          placeholder="Ingrese Código Cliente"
                           style={{ width: "100%" }}
-                          dropdownStyle={{ borderColor: "#1890ff" }}
-                        >
-                          <Option value="">Seleccionar</Option>
-                          <Option value="true">c</Option>
-                          <Option value="false">c</Option>
-                        </Select>
+                          onChange={(e) =>
+                            NombreNegocio("codigoCliente", e.target.value)
+                          }
+                        />
                       )}
                     />
                   </Form.Item>
@@ -655,16 +649,13 @@ const Filters: React.FC = () => {
                       name="nombreNegocio"
                       control={control}
                       render={({ field }) => (
-                        <Select
+                        <Input
                           {...field}
-                          placeholder="Seleccionar Nombre Negocio"
-                          style={{ width: "100%" }}
-                          dropdownStyle={{ borderColor: "#1890ff" }}
-                        >
-                          <Option value="">Seleccionar</Option>
-                          <Option value="true">c</Option>
-                          <Option value="false">c</Option>
-                        </Select>
+                          placeholder="Ingrese Nombre Negocio"
+                          onChange={(e) =>
+                            NombreNegocio("nombreNegocio", e.target.value)
+                          }
+                        />
                       )}
                     />
                   </Form.Item>
