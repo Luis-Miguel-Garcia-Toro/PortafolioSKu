@@ -87,6 +87,7 @@ const Filters: React.FC = () => {
         setdataGDV(GDVresponse.data);
         setdataJDV(JDVresponse.data);
         setdataSDV(SDVresponse.data);
+        console.log(RDVresponse.data);
         setdataRDV(RDVresponse.data);
 
         // Ensure that bodega is set with the initial data
@@ -621,7 +622,7 @@ const Filters: React.FC = () => {
                         >
                           <Option value="">Seleccionar</Option>
                           {dataRDV.map((rdv: any) => (
-                            <Option key={rdv.id} value={rdv.id}>
+                            <Option key={rdv.id} value={rdv.codigo}>
                               {rdv.nombre}
                             </Option>
                           ))}
