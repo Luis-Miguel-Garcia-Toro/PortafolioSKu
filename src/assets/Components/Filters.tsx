@@ -82,7 +82,6 @@ const Filters: React.FC = () => {
         setdataMisiones(misionesResponse.data);
         setdataTipoMotor(tipoMotorResponse.data);
         setdataRegional(regionalResponse.data);
-        setdataAgrupaMotor(dataAgrupaMotor.data);
         setdataBodega(bodegaResponse.data);
         setdataGDV(GDVresponse.data);
         setdataJDV(JDVresponse.data);
@@ -151,6 +150,23 @@ const Filters: React.FC = () => {
   const selectedMissionId = watch("nombreMision");
   const selectRegional = watch("codigoRegional");
   const selectGDV = watch("gdv");
+  const tipoMision = watch('motorId');
+
+  // Llamar a obtenerAgrupadorMision cuando tipoMision cambie
+  const setParametrosAgrupadorMotor = async(id : any) => {
+    const bodegaResponse = await UserServices.GetTipoAgrupadorMotor(id);
+    setdataAgrupaMotor(bodegaResponse.data);
+    setValue("agrupadorMotor", null);
+  }
+  useEffect(() => {
+    if (tipoMision) {
+      try {
+        setParametrosAgrupadorMotor(tipoMision)
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+  }, [tipoMision]);
 
   useEffect(() => {
     if (selectRegional && dataRegional.length > 0) {
@@ -372,6 +388,7 @@ const Filters: React.FC = () => {
                           style={{ width: "100%" }}
                           dropdownStyle={{ borderColor: "#1890ff" }}
                         >
+                          <Option value={null}>Seleccionar</Option>
                           {dataTipoMotor.map((motor: any) => (
                             <Option key={motor.id} value={motor.id}>
                               {motor.nombre}
@@ -396,14 +413,15 @@ const Filters: React.FC = () => {
                           style={{ width: "100%" }}
                           dropdownStyle={{ borderColor: "#1890ff" }}
                         >
-                          {/* {dataAgrupaMotor.map((Amotor: any) => (
+                          <Option value={null}>Seleccionar</Option>
+                          {dataAgrupaMotor.map((Amotor: any) => (
                             <Option
-                              key={Amotor.codigo}
-                              value={Amotor.codigo}
+                              key={Amotor.id}
+                              value={Amotor.id}
                             >
-                              {Amotor.agrupadorMotor}
+                              {Amotor.nombreAgrupador}
                             </Option>
-                          ))} */}
+                          ))}
                         </Select>
                       )}
                     />

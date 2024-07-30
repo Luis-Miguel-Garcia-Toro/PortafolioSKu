@@ -46,6 +46,19 @@ const UserServices = {
         throw e;
       });
   },
+  GetTipoAgrupadorMotor: (id : any) => {
+    return axiosInstance
+      .get(`${baseUrl.url}/ImageEverest/AgrupadorMotores?motorId=${id}`)
+      .then((res) => {
+        let r = res.data;
+        return r;
+      })
+
+      .catch((e) => {
+        console.error(e);
+        throw e;
+      });
+  },
   GetRegional: () => {
     return axiosInstance
       .get(`${baseUrl.url}/ImageEverest/Regional`)
