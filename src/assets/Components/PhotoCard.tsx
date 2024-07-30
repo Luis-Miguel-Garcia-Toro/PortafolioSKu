@@ -22,8 +22,13 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ photoUrl, clientData }) => {
     <Col xs={24} sm={12} lg={8}>
       <Card
         hoverable
-        cover={<img alt="Foto" src={photoUrl} style={{ height: 300 }} />}
-        
+        cover={
+          <img
+            alt="Foto"
+            src={`data:image/jpeg;base64,${photoUrl}`}
+            style={{ height: 570 }}
+          />
+        }
       >
         <Card.Meta
           //title={`Cliente: ${clientData.clientId}`}
@@ -34,19 +39,25 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ photoUrl, clientData }) => {
               </p>
 
               <p style={{ margin: 0 }}>
-                <strong>Zona:</strong> {clientData.zonaRDV ? clientData.zonaRDV : "Sin Zona"}
+                <strong>Zona:</strong>{" "}
+                {clientData.zonaRDV ? clientData.zonaRDV : "Sin Zona"}
               </p>
               <p style={{ margin: 0 }}>
-                <strong>Nombre Cedi:</strong> {clientData.nombreBodega ? clientData.nombreBodega : "Sin nombre Cedi" }
+                <strong>Nombre Cedi:</strong>{" "}
+                {clientData.nombreBodega
+                  ? clientData.nombreBodega
+                  : "Sin nombre Cedi"}
               </p>
               <p style={{ margin: 0 }}>
-                <strong>Nombre Misión:</strong> {clientData.nombreMision ? clientData.nombreMision : "Sin Nombre de Misión"}
+                <strong>Nombre Misión:</strong>{" "}
+                {clientData.nombreMision
+                  ? clientData.nombreMision
+                  : "Sin Nombre de Misión"}
               </p>
-                <p style={{ margin: 0 }}>
-                  <strong>Veredicto:</strong> {clientData.veredicto ? clientData.veredicto: "Sin veredicto"}                  
-                </p>
-                
-              
+              <p style={{ margin: 0 }}>
+                <strong>Veredicto:</strong>{" "}
+                {clientData.veredicto ? "No Aprobado" : "Aprobado"}
+              </p>
             </div>
           }
         />

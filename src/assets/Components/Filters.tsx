@@ -87,7 +87,7 @@ const Filters: React.FC = () => {
         setdataGDV(GDVresponse.data);
         setdataJDV(JDVresponse.data);
         setdataSDV(SDVresponse.data);
-        console.log(RDVresponse.data);
+        // console.log(RDVresponse.data);
         setdataRDV(RDVresponse.data);
 
         // Ensure that bodega is set with the initial data
@@ -150,6 +150,7 @@ const Filters: React.FC = () => {
 
   const selectedMissionId = watch("nombreMision");
   const selectRegional = watch("codigoRegional");
+  const selectGDV = watch("gdv");
 
   useEffect(() => {
     if (selectRegional && dataRegional.length > 0) {
@@ -164,6 +165,21 @@ const Filters: React.FC = () => {
       setdataBodega(selectedBodega);
       setValue("bodega", selectedBodega);
     }
+    ///
+    if (selectGDV && selectGDV.length > 0) {
+      const selectGDV = dataGDV.find(
+        (codigoGdv: any) => codigoGdv.codigo == selectGDV
+      );
+      setValue("gdv", selectGDV.codigo);
+
+      const selectedjdv = dataGDV.filter(
+        (GDV: any) => GDV.gdv == selectGDV
+      );
+      setdataJDV(selectedjdv);
+      setValue("jdv", selectedjdv);
+      console.log(selectGDV,"ddddddd")
+    }
+    ///
     if (selectedMissionId && dataMisiones.length > 0) {
       const selectedMission = dataMisiones.find(
         (mision: any) => mision.id === selectedMissionId
@@ -190,7 +206,7 @@ const Filters: React.FC = () => {
         setValue("fechaFin", endDate);
         setValue("misionId", selectedMission.id);
         setValue("nombreMision", selectedMission.nombreMision);
-        setValue("estado", selectedMission.estado);
+        setValue("estado", Number(selectedMission.estado));
       }
     }
   }, [
@@ -259,7 +275,7 @@ const Filters: React.FC = () => {
         <Collapse activeKey={expandFilters ? ["1"] : []}>
           <Panel header="Filtros" key="1">
             <Row gutter={[8, 24]}>
-              <Col xs={24} sm={12} lg={4}>
+              <Col xs={24} sm={12} lg={6}>
                 <Card hoverable>
                   <Form.Item label="Nombre Misión">
                     <Controller
@@ -298,7 +314,7 @@ const Filters: React.FC = () => {
                   </Form.Item>
                 </Card>
               </Col>
-              <Col xs={24} sm={12} lg={4}>
+              <Col xs={24} sm={12} lg={6}>
                 <Card hoverable>
                   <Form.Item label="Fecha inicial">
                     <Controller
@@ -308,7 +324,7 @@ const Filters: React.FC = () => {
                         <DatePicker
                           {...field}
                           format={dateFormat}
-                          placeholder="Fecha inicial"
+                          placeholder="Fecha Inicial"
                           style={{ width: "100%" }}
                           onChange={(date) =>
                             handleInputChange("fechaInicio", date)
@@ -320,7 +336,7 @@ const Filters: React.FC = () => {
                   </Form.Item>
                 </Card>
               </Col>
-              <Col xs={24} sm={12} lg={4}>
+              <Col xs={24} sm={12} lg={6}>
                 <Card hoverable>
                   <Form.Item label="Fecha Final">
                     <Controller
@@ -343,7 +359,7 @@ const Filters: React.FC = () => {
                 </Card>
               </Col>
 
-              <Col xs={24} sm={12} lg={4}>
+              <Col xs={24} sm={12} lg={6}>
                 <Card hoverable>
                   <Form.Item label="Tipo Motor">
                     <Controller
@@ -367,7 +383,7 @@ const Filters: React.FC = () => {
                   </Form.Item>
                 </Card>
               </Col>
-              <Col xs={24} sm={12} lg={4}>
+              <Col xs={24} sm={12} lg={6}>
                 <Card hoverable>
                   <Form.Item label="Agrupador Motor">
                     <Controller
@@ -394,7 +410,7 @@ const Filters: React.FC = () => {
                   </Form.Item>
                 </Card>
               </Col>
-              <Col xs={24} sm={12} lg={4}>
+              <Col xs={24} sm={12} lg={6}>
                 <Card hoverable>
                   <Form.Item label="Tipo Misión">
                     <Controller
@@ -418,7 +434,7 @@ const Filters: React.FC = () => {
                   </Form.Item>
                 </Card>
               </Col>
-              <Col xs={24} sm={12} lg={4}>
+              <Col xs={24} sm={12} lg={6}>
                 <Card hoverable>
                   <Form.Item label="Estado">
                     <Controller
@@ -431,16 +447,16 @@ const Filters: React.FC = () => {
                           style={{ width: "100%" }}
                           dropdownStyle={{ borderColor: "#1890ff" }}
                         >
-                          <Option value="">Seleccionar</Option>
-                          <Option value="1">Aprobado</Option>
-                          <Option value="0">No Aprobado</Option>
+                          <Option value={null}>Seleccionar</Option>
+                          <Option value={Number(1)}>Activo</Option>
+                          <Option value={Number(0)}>Inactivo</Option>
                         </Select>
                       )}
                     />
                   </Form.Item>
                 </Card>
               </Col>
-              <Col xs={24} sm={12} lg={4}>
+              <Col xs={24} sm={12} lg={6}>
                 <Card hoverable>
                   <Form.Item label="Veredicto">
                     <Controller
@@ -462,7 +478,7 @@ const Filters: React.FC = () => {
                   </Form.Item>
                 </Card>
               </Col>
-              <Col xs={24} sm={12} lg={4}>
+              <Col xs={24} sm={12} lg={6}>
                 <Card hoverable>
                   <Form.Item label="Nombre Regional">
                     <Controller
@@ -494,7 +510,7 @@ const Filters: React.FC = () => {
                   </Form.Item>
                 </Card>
               </Col>
-              <Col xs={24} sm={12} lg={4}>
+              <Col xs={24} sm={12} lg={6}>
                 <Card hoverable>
                   <Form.Item label="Nombre Cedi">
                     <Controller
@@ -506,7 +522,6 @@ const Filters: React.FC = () => {
                           placeholder="Seleccionar una Cedi"
                           style={{ width: "100%" }}
                           dropdownStyle={{ borderColor: "#1890ff" }}
-                          defaultValue=""
                         >
                           <Option value="">Seleccionar</Option>
                           {dataBodega.map((cedi: any) => (
@@ -520,9 +535,9 @@ const Filters: React.FC = () => {
                   </Form.Item>
                 </Card>
               </Col>
-              <Col xs={24} sm={12} lg={4}>
+              <Col xs={24} sm={12} lg={6}>
                 <Card hoverable>
-                  <Form.Item label="gerente Venta">
+                  <Form.Item label="Gerente Venta">
                     <Controller
                       name="gdv"
                       control={control}
@@ -545,7 +560,7 @@ const Filters: React.FC = () => {
                   </Form.Item>
                 </Card>
               </Col>
-              <Col xs={24} sm={12} lg={4}>
+              <Col xs={24} sm={12} lg={6}>
                 <Card hoverable>
                   <Form.Item label="Jefe Ventas">
                     <Controller
@@ -566,7 +581,7 @@ const Filters: React.FC = () => {
                           <Option value="">Seleccionar</Option>
                           {dataJDV.map((JDV: any) => (
                             <Option key={JDV.codigo} value={JDV.codigo}>
-                              {JDV.nombre}
+                              ({JDV.codigo}) {JDV.nombre}
                             </Option>
                           ))}
                         </Select>
@@ -575,7 +590,7 @@ const Filters: React.FC = () => {
                   </Form.Item>
                 </Card>
               </Col>
-              <Col xs={24} sm={12} lg={4}>
+              <Col xs={24} sm={12} lg={6}>
                 <Card hoverable>
                   <Form.Item label="Supervisor">
                     <Controller
@@ -594,7 +609,7 @@ const Filters: React.FC = () => {
                           <Option value="">Seleccionar</Option>
                           {dataSDV.map((SDV: any) => (
                             <Option key={SDV.codigo} value={SDV.codigo}>
-                              {SDV.nombre}
+                              ({SDV.codigo}) {SDV.nombre}
                             </Option>
                           ))}
                         </Select>
@@ -603,7 +618,7 @@ const Filters: React.FC = () => {
                   </Form.Item>
                 </Card>
               </Col>
-              <Col xs={24} sm={12} lg={4}>
+              <Col xs={24} sm={12} lg={6}>
                 <Card hoverable>
                   <Form.Item label="RDV">
                     <Controller
@@ -623,7 +638,7 @@ const Filters: React.FC = () => {
                           <Option value="">Seleccionar</Option>
                           {dataRDV.map((rdv: any) => (
                             <Option key={rdv.id} value={rdv.codigo}>
-                              {rdv.nombre}
+                              ({rdv.codigo}) {rdv.nombre}
                             </Option>
                           ))}
                         </Select>
@@ -632,7 +647,7 @@ const Filters: React.FC = () => {
                   </Form.Item>
                 </Card>
               </Col>
-              <Col xs={24} sm={12} lg={4}>
+              <Col xs={24} sm={12} lg={6}>
                 <Card hoverable>
                   <Form.Item label="Código Cliente">
                     <Controller
@@ -653,7 +668,7 @@ const Filters: React.FC = () => {
                   </Form.Item>
                 </Card>
               </Col>
-              <Col xs={24} sm={12} lg={4}>
+              <Col xs={24} sm={12} lg={6}>
                 <Card hoverable>
                   <Form.Item label="Nombre Negocio">
                     <Controller
@@ -673,7 +688,7 @@ const Filters: React.FC = () => {
                 </Card>
               </Col>
 
-              <Col xs={24} sm={12} lg={4}>
+              <Col xs={24} sm={12} lg={6}>
                 <Card hoverable>
                   <Form.Item label="Imágenes por página">
                     <Controller
