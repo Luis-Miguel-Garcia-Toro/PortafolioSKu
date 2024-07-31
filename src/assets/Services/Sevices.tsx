@@ -114,7 +114,7 @@ const UserServices = {
   },
   PostSDV: (data:any) => {
     return axiosInstance
-      .post(`${baseUrl.url}/ImageEverest/getJDV`,data)
+      .post(`${baseUrl.url}/ImageEverest/getSDV`,data)
       .then((res) => {
         let r = res.data;
         return r;

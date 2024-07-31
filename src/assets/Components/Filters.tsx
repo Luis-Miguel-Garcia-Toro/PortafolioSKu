@@ -46,7 +46,7 @@ const Filters: React.FC = () => {
   const [dataSDV, setdataSDV] = useState<any>([]);
   const [dataRDV, setdataRDV] = useState<any>([]);
 
-  const [formPost] = useState<any>({
+  const [formPost, setFormPost] = useState<any>({
     regional: "",
     bodega: "",
     codigoGdv: "",
@@ -56,6 +56,14 @@ const Filters: React.FC = () => {
     zonaRdv: "",
     companiaRdv: "",
   });
+
+  const updateFieldPersonas = (fieldName, value) => {
+    setFormPost(prevState => ({
+      ...prevState,
+      [fieldName]: value,
+    }));
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -86,8 +94,8 @@ const Filters: React.FC = () => {
         setdataGDV(GDVresponse.data);
         setdataJDV(JDVresponse.data);
         setdataSDV(SDVresponse.data);
-        // console.log(RDVresponse.data);
         setdataRDV(RDVresponse.data);
+        // console.log(RDVresponse.data);
 
         // Ensure that bodega is set with the initial data
         setBodega(bodegaResponse.data);
@@ -187,13 +195,15 @@ const Filters: React.FC = () => {
         (codigoGdv: any) => codigoGdv.codigo == selectGDV
       );
       setValue("gdv", selectGDV.codigo);
+      updateFieldPersonas("codigoGdv", selectGDV.codigo);
 
       const selectedjdv = dataGDV.filter(
         (GDV: any) => GDV.gdv == selectGDV
       );
       setdataJDV(selectedjdv);
       setValue("jdv", selectedjdv);
-      console.log(selectGDV,"ddddddd")
+      updateFieldPersonas("codigoJDV", selectedjdv);
+      //console.log(selectGDV,"ddddddd")
     }
     ///
     if (selectedMissionId && dataMisiones.length > 0) {
@@ -276,7 +286,89 @@ const Filters: React.FC = () => {
     gdv: watch("gdv"),
     jdv: watch("jdv"),
     supervisor: watch("sdv"),
+    rdv: watch("rdv"),
   };
+  
+
+  useEffect(() => {
+    const fetchData = async () => {
+      let gdv = Observers.gdv;
+      let jdv = Observers.jdv;
+      let sdv = Observers.supervisor;
+      let rdv = Observers.rdv;
+      //gdv: watch("gdv"),
+      //jdv: watch("jdv"),
+      //supervisor: watch("sdv"),
+      //rdv: watch("rdv"),
+      //codigoGdv: "",
+      //codigoJdv: "",
+      //codigoSdv: "",
+      //codigoRdv: "",
+      let formDataTemp = {...formPost,
+        codigoGdv: "",
+        codigoJdv: "",
+        codigoSdv: "",
+        codigoRdv: "",
+        companiaRdv: "",
+      };
+      
+      try {
+        // Primero llamar a la API GDV
+        formDataTemp = {...formDataTemp, ["codigoGdv"]: gdv}
+        if (gdv && gdv.trim() !== "" && gdv != formPost.codigoGdv) {
+          updateFieldPersonas("codigoGdv", gdv);
+          const dataApi = await UserServices.PostJDV(formDataTemp);
+          setdataJDV(dataApi.data);
+          //vaciar campos
+          updateFieldPersonas("codigoJdv","");
+          updateFieldPersonas("codigoSdv","");
+          updateFieldPersonas("codigoRdv","");
+          setValue("jdv","");
+          setValue("sdv","");
+          setValue("rdv","");
+        }
+        
+        // Luego, si GDV fue llamado, llamar a JDV
+        formDataTemp = {...formDataTemp, ["codigoJdv"]: jdv}
+        if (formPost.codigoGdv && formPost.codigoGdv.trim() !== "") {
+          if (jdv && jdv.trim() !== "" && jdv != formPost.codigoJdv) {
+            updateFieldPersonas("codigoJdv", jdv);
+            const dataApi = await UserServices.PostSDV(formDataTemp);
+            setdataSDV(dataApi.data);
+            updateFieldPersonas("codigoSdv","");
+            updateFieldPersonas("codigoRdv","");
+            setValue("sdv","");
+            setValue("rdv","");
+          }
+        }
+        
+        // Luego, si JDV fue llamado, llamar a SDV
+        formDataTemp = {...formDataTemp, ["codigoSdv"]: sdv}
+        if (formPost.codigoJdv && formPost.codigoJdv.trim() !== "") {
+          if (sdv && sdv.trim() !== "" && sdv != formPost.codigoSdv) {
+            updateFieldPersonas("codigoSdv", sdv);
+            const dataApi = await UserServices.PostRDV(formDataTemp);
+            setdataRDV(dataApi.data);
+            updateFieldPersonas("codigoRdv","");
+            setValue("rdv","");
+          }
+        }
+
+        // Finalmente, si SDV fue llamado, llamar a RDV
+        if (formPost.codigoSdv && formPost.codigoSdv.trim() !== "") {
+          if (rdv && rdv.trim() !== "" && rdv != formPost.codigoRdv) {
+            updateFieldPersonas("codigoRdv", rdv);
+          }
+        }
+
+      } catch (error) {
+        //console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+
+  }, [Observers]);
 
   return (
     <div style={{ padding: "30px" }}>
