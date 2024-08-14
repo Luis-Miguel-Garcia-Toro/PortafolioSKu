@@ -58,7 +58,7 @@ const Filters: React.FC = () => {
   });
 
   const updateFieldPersonas = (fieldName, value) => {
-    setFormPost(prevState => ({
+    setFormPost((prevState) => ({
       ...prevState,
       [fieldName]: value,
     }));
@@ -149,7 +149,7 @@ const Filters: React.FC = () => {
       rdv: "",
       gdv: "",
       zonaRDV: "",
-      veredict: "",
+      veredict: "true",
       page: paginaActual, // Assuming paginaActual is a number and defined
       pageSize: 100,
     },
@@ -158,18 +158,18 @@ const Filters: React.FC = () => {
   const selectedMissionId = watch("nombreMision");
   const selectRegional = watch("codigoRegional");
   const selectGDV = watch("gdv");
-  const tipoMision = watch('motorId');
+  const tipoMision = watch("motorId");
 
   // Llamar a obtenerAgrupadorMision cuando tipoMision cambie
-  const setParametrosAgrupadorMotor = async(id : any) => {
+  const setParametrosAgrupadorMotor = async (id: any) => {
     const bodegaResponse = await UserServices.GetTipoAgrupadorMotor(id);
     setdataAgrupaMotor(bodegaResponse.data);
     setValue("agrupadorMotor", null);
-  }
+  };
   useEffect(() => {
     if (tipoMision) {
       try {
-        setParametrosAgrupadorMotor(tipoMision)
+        setParametrosAgrupadorMotor(tipoMision);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -197,9 +197,7 @@ const Filters: React.FC = () => {
       setValue("gdv", selectGDV.codigo);
       updateFieldPersonas("codigoGdv", selectGDV.codigo);
 
-      const selectedjdv = dataGDV.filter(
-        (GDV: any) => GDV.gdv == selectGDV
-      );
+      const selectedjdv = dataGDV.filter((GDV: any) => GDV.gdv == selectGDV);
       setdataJDV(selectedjdv);
       setValue("jdv", selectedjdv);
       updateFieldPersonas("codigoJDV", selectedjdv);
@@ -288,7 +286,6 @@ const Filters: React.FC = () => {
     supervisor: watch("sdv"),
     rdv: watch("rdv"),
   };
-  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -304,53 +301,54 @@ const Filters: React.FC = () => {
       //codigoJdv: "",
       //codigoSdv: "",
       //codigoRdv: "",
-      let formDataTemp = {...formPost,
+      let formDataTemp = {
+        ...formPost,
         codigoGdv: "",
         codigoJdv: "",
         codigoSdv: "",
         codigoRdv: "",
         companiaRdv: "",
       };
-      
+
       try {
         // Primero llamar a la API GDV
-        formDataTemp = {...formDataTemp, ["codigoGdv"]: gdv}
+        formDataTemp = { ...formDataTemp, ["codigoGdv"]: gdv };
         if (gdv && gdv.trim() !== "" && gdv != formPost.codigoGdv) {
           updateFieldPersonas("codigoGdv", gdv);
           const dataApi = await UserServices.PostJDV(formDataTemp);
           setdataJDV(dataApi.data);
           //vaciar campos
-          updateFieldPersonas("codigoJdv","");
-          updateFieldPersonas("codigoSdv","");
-          updateFieldPersonas("codigoRdv","");
-          setValue("jdv","");
-          setValue("sdv","");
-          setValue("rdv","");
+          updateFieldPersonas("codigoJdv", "");
+          updateFieldPersonas("codigoSdv", "");
+          updateFieldPersonas("codigoRdv", "");
+          setValue("jdv", "");
+          setValue("sdv", "");
+          setValue("rdv", "");
         }
-        
+
         // Luego, si GDV fue llamado, llamar a JDV
-        formDataTemp = {...formDataTemp, ["codigoJdv"]: jdv}
+        formDataTemp = { ...formDataTemp, ["codigoJdv"]: jdv };
         if (formPost.codigoGdv && formPost.codigoGdv.trim() !== "") {
           if (jdv && jdv.trim() !== "" && jdv != formPost.codigoJdv) {
             updateFieldPersonas("codigoJdv", jdv);
             const dataApi = await UserServices.PostSDV(formDataTemp);
             setdataSDV(dataApi.data);
-            updateFieldPersonas("codigoSdv","");
-            updateFieldPersonas("codigoRdv","");
-            setValue("sdv","");
-            setValue("rdv","");
+            updateFieldPersonas("codigoSdv", "");
+            updateFieldPersonas("codigoRdv", "");
+            setValue("sdv", "");
+            setValue("rdv", "");
           }
         }
-        
+
         // Luego, si JDV fue llamado, llamar a SDV
-        formDataTemp = {...formDataTemp, ["codigoSdv"]: sdv}
+        formDataTemp = { ...formDataTemp, ["codigoSdv"]: sdv };
         if (formPost.codigoJdv && formPost.codigoJdv.trim() !== "") {
           if (sdv && sdv.trim() !== "" && sdv != formPost.codigoSdv) {
             updateFieldPersonas("codigoSdv", sdv);
             const dataApi = await UserServices.PostRDV(formDataTemp);
             setdataRDV(dataApi.data);
-            updateFieldPersonas("codigoRdv","");
-            setValue("rdv","");
+            updateFieldPersonas("codigoRdv", "");
+            setValue("rdv", "");
           }
         }
 
@@ -360,14 +358,12 @@ const Filters: React.FC = () => {
             updateFieldPersonas("codigoRdv", rdv);
           }
         }
-
       } catch (error) {
         //console.error("Error fetching data:", error);
       }
     };
 
     fetchData();
-
   }, [Observers]);
 
   return (
@@ -507,10 +503,7 @@ const Filters: React.FC = () => {
                         >
                           <Option value={null}>Seleccionar</Option>
                           {dataAgrupaMotor.map((Amotor: any) => (
-                            <Option
-                              key={Amotor.id}
-                              value={Amotor.id}
-                            >
+                            <Option key={Amotor.id} value={Amotor.id}>
                               {Amotor.nombreAgrupador}
                             </Option>
                           ))}
@@ -588,6 +581,7 @@ const Filters: React.FC = () => {
                   </Form.Item>
                 </Card>
               </Col>
+
               <Col xs={24} sm={12} lg={6}>
                 <Card hoverable>
                   <Form.Item label="Nombre Regional">
@@ -634,8 +628,8 @@ const Filters: React.FC = () => {
                           dropdownStyle={{ borderColor: "#1890ff" }}
                         >
                           <Option value="">Seleccionar</Option>
-                          {dataBodega.map((cedi: any) => (
-                            <Option key={cedi.codigo} value={cedi.codigo}>
+                          {dataBodega.map((cedi: any, index: number) => (
+                            <Option key={index} value={cedi.codigo}>
                               {cedi.nombreBodega}
                             </Option>
                           ))}
@@ -659,8 +653,8 @@ const Filters: React.FC = () => {
                           dropdownStyle={{ borderColor: "#1890ff" }}
                         >
                           <Option value="">Seleccionar</Option>
-                          {dataGDV.map((GDV: any) => (
-                            <Option key={GDV.codigo} value={GDV.codigo}>
+                          {dataGDV.map((GDV: any, index: number) => (
+                            <Option key={index} value={GDV.codigo}>
                               {GDV.nombre}
                             </Option>
                           ))}
@@ -689,8 +683,8 @@ const Filters: React.FC = () => {
                           }
                         >
                           <Option value="">Seleccionar</Option>
-                          {dataJDV.map((JDV: any) => (
-                            <Option key={JDV.codigo} value={JDV.codigo}>
+                          {dataJDV.map((JDV: any, index: number) => (
+                            <Option key={index} value={JDV.codigo}>
                               ({JDV.codigo}) {JDV.nombre}
                             </Option>
                           ))}
@@ -717,8 +711,8 @@ const Filters: React.FC = () => {
                           dropdownStyle={{ borderColor: "#1890ff" }}
                         >
                           <Option value="">Seleccionar</Option>
-                          {dataSDV.map((SDV: any) => (
-                            <Option key={SDV.codigo} value={SDV.codigo}>
+                          {dataSDV.map((SDV: any, index: number) => (
+                            <Option key={index} value={SDV.codigo}>
                               ({SDV.codigo}) {SDV.nombre}
                             </Option>
                           ))}
@@ -746,8 +740,8 @@ const Filters: React.FC = () => {
                           dropdownStyle={{ borderColor: "#1890ff" }}
                         >
                           <Option value="">Seleccionar</Option>
-                          {dataRDV.map((rdv: any) => (
-                            <Option key={rdv.id} value={rdv.codigo}>
+                          {dataRDV.map((rdv: any, index: number) => (
+                            <Option key={index} value={rdv.codigo}>
                               ({rdv.codigo}) {rdv.nombre}
                             </Option>
                           ))}

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const baseUrl = {
-  url: "https://postobon-supervisores-dev.sandboxcw.net/ImageMisiones/api",
+  url: "https://postobon-apis.celuwebcloud.com/SDVImageMisiones/api",
 }; //URL base
 // const urlFiltros = { urlFiltros: "https://postobon-supervisores-dev.sandboxcw.net/ImageMisiones/api/ImageEverest/Misiones" };
 const axiosInstance = axios.create({});
