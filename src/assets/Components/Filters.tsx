@@ -57,8 +57,8 @@ const Filters: React.FC = () => {
     companiaRdv: "",
   });
 
-  const updateFieldPersonas = (fieldName, value) => {
-    setFormPost((prevState) => ({
+  const updateFieldPersonas = (fieldName:any, value:any) => {
+    setFormPost((prevState:any) => ({
       ...prevState,
       [fieldName]: value,
     }));
@@ -805,10 +805,11 @@ const Filters: React.FC = () => {
                           style={{ width: "100%" }}
                           dropdownStyle={{ borderColor: "#1890ff" }}
                         >
+                          <Option value={10}>10</Option>
+                          <Option value={20}>20</Option>
+                          <Option value={50}>50</Option>
                           <Option value={100}>100</Option>
                           <Option value={500}>500</Option>
-                          {/* <Option value={1000}>1.000</Option>
-                          <Option value={100000}>100.000</Option> */}
                         </Select>
                       )}
                     />

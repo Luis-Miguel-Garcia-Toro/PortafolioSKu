@@ -56,7 +56,10 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ photoUrl, clientData }) => {
               </p>
               <p style={{ margin: 0 }}>
                 <strong>Veredicto:</strong>{" "}
-                {clientData.veredicto ? "No Aprobado" : "Aprobado"}
+                {clientData.veredicto != null &&
+                JSON.parse(clientData.veredicto.toLowerCase())
+                  ? "Aprobado"
+                  : "No Aprobado"}
               </p>
             </div>
           }
